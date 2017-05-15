@@ -29,6 +29,6 @@ class CreacionTablaSales extends Migration
      */
     public function down()
     {
-        //
+        Schema::dropIfExists('sales');
     }
 }
