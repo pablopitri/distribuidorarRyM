@@ -12,3 +12,7 @@
 */
 
 Route::get('/', 'MainController@home');
+
+Route::resource('/sales', 'SalesController');
+
+Route::resource('/products', 'ProductsController');
