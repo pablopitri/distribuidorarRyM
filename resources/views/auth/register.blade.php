@@ -4,7 +4,7 @@
   <div class="container">
     <div class="row">
       <div class="col-md-12">
-        <div class="panel panel-default">
+        <div class="panel panel-default margin-top-md">
           <div class="panel-heading">Registrarse</div>
           <div class="panel-body">
             <form class="form-horizontal" role="form" method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
@@ -77,6 +77,14 @@
                     Registrar
                   </button>
                 </div>
+              </div>
+
+              <div class="form-group margin-top">
+                  <div class="col-xs-12 center margin-top">
+                      <a class="btn btn-link" href="{{ route('login') }}">
+                          Login
+                      </a>
+                  </div>
               </div>
 
             </form>

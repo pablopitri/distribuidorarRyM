@@ -5,6 +5,12 @@
 // Variables
 @import "variables";
 
+#app{
+	background-image: url(http://localhost/distribuidoraRyM/public/images/fondo.jpg);
+	background-repeat: no-repeat;
+  background-size: cover;
+}
+
 .center{
 	text-align: center !important;
 }
@@ -73,13 +79,20 @@
 	}
 }
 
-
 .hidden{
 	display: none;
 }
 
 .margin-r{
 	margin-right: 1em;
+}
+
+.margin-top-lg{
+	margin-top: 20%;
+}
+
+.margin-top-md{
+	margin-top: 5%;
 }
 
 .user-image{

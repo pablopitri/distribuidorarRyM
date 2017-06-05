@@ -73,7 +73,8 @@ class SalesController extends Controller
      */
     public function show($id)
     {
-        //
+        $sale = Sale::find($id);
+        return view('sales.show', ['sale' => $sale]);
     }
 
     /**

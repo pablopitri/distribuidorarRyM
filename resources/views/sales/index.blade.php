@@ -83,9 +83,9 @@
 				    			<table>
 				    				<tr>
 				    					<td>
-				    						<a href="{{ url("/sales/$sale->id/edit") }}" class="btn btn-sm btn-warning margin-r">
-				    							<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-				    							EDITAR
+				    						<a href="{{ url("/sales/$sale->id") }}" class="btn btn-sm btn-primary margin-r">
+				    							<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+				    							VER
 				    						</a>
 				    					</td>
 											<td>

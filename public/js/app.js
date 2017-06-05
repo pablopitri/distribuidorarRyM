@@ -63,345 +63,682 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ 	return __webpack_require__(__webpack_require__.s = 37);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(37);
-__webpack_require__(2);
-__webpack_require__(11);
-__webpack_require__(44);
+"use strict";
 
-$('#rol').bootstrapToggle({
-	on: 'Administrador',
-	off: 'Cajero'
-});
 
-// DATAPICKER
-$.datepicker.regional['es'] = {
-	closeText: 'Cerrar',
-	prevText: '<Ant',
-	nextText: 'Sig>',
-	currentText: 'Hoy',
-	monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-	monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-	dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
-	dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mié', 'Juv', 'Vie', 'Sáb'],
-	dayNamesMin: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'],
-	weekHeader: 'Sm',
-	dateFormat: 'dd-mm-yy',
-	firstDay: 1,
-	isRTL: false,
-	showMonthAfterYear: false,
-	yearSuffix: ''
+var bind = __webpack_require__(6);
+
+/*global toString:true*/
+
+// utils is a library of generic helper functions non-specific to axios
+
+var toString = Object.prototype.toString;
+
+/**
+ * Determine if a value is an Array
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an Array, otherwise false
+ */
+function isArray(val) {
+  return toString.call(val) === '[object Array]';
+}
+
+/**
+ * Determine if a value is an ArrayBuffer
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an ArrayBuffer, otherwise false
+ */
+function isArrayBuffer(val) {
+  return toString.call(val) === '[object ArrayBuffer]';
+}
+
+/**
+ * Determine if a value is a FormData
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an FormData, otherwise false
+ */
+function isFormData(val) {
+  return (typeof FormData !== 'undefined') && (val instanceof FormData);
+}
+
+/**
+ * Determine if a value is a view on an ArrayBuffer
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a view on an ArrayBuffer, otherwise false
+ */
+function isArrayBufferView(val) {
+  var result;
+  if ((typeof ArrayBuffer !== 'undefined') && (ArrayBuffer.isView)) {
+    result = ArrayBuffer.isView(val);
+  } else {
+    result = (val) && (val.buffer) && (val.buffer instanceof ArrayBuffer);
+  }
+  return result;
+}
+
+/**
+ * Determine if a value is a String
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a String, otherwise false
+ */
+function isString(val) {
+  return typeof val === 'string';
+}
+
+/**
+ * Determine if a value is a Number
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Number, otherwise false
+ */
+function isNumber(val) {
+  return typeof val === 'number';
+}
+
+/**
+ * Determine if a value is undefined
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if the value is undefined, otherwise false
+ */
+function isUndefined(val) {
+  return typeof val === 'undefined';
+}
+
+/**
+ * Determine if a value is an Object
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an Object, otherwise false
+ */
+function isObject(val) {
+  return val !== null && typeof val === 'object';
+}
+
+/**
+ * Determine if a value is a Date
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Date, otherwise false
+ */
+function isDate(val) {
+  return toString.call(val) === '[object Date]';
+}
+
+/**
+ * Determine if a value is a File
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a File, otherwise false
+ */
+function isFile(val) {
+  return toString.call(val) === '[object File]';
+}
+
+/**
+ * Determine if a value is a Blob
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Blob, otherwise false
+ */
+function isBlob(val) {
+  return toString.call(val) === '[object Blob]';
+}
+
+/**
+ * Determine if a value is a Function
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Function, otherwise false
+ */
+function isFunction(val) {
+  return toString.call(val) === '[object Function]';
+}
+
+/**
+ * Determine if a value is a Stream
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Stream, otherwise false
+ */
+function isStream(val) {
+  return isObject(val) && isFunction(val.pipe);
+}
+
+/**
+ * Determine if a value is a URLSearchParams object
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a URLSearchParams object, otherwise false
+ */
+function isURLSearchParams(val) {
+  return typeof URLSearchParams !== 'undefined' && val instanceof URLSearchParams;
+}
+
+/**
+ * Trim excess whitespace off the beginning and end of a string
+ *
+ * @param {String} str The String to trim
+ * @returns {String} The String freed of excess whitespace
+ */
+function trim(str) {
+  return str.replace(/^\s*/, '').replace(/\s*$/, '');
+}
+
+/**
+ * Determine if we're running in a standard browser environment
+ *
+ * This allows axios to run in a web worker, and react-native.
+ * Both environments support XMLHttpRequest, but not fully standard globals.
+ *
+ * web workers:
+ *  typeof window -> undefined
+ *  typeof document -> undefined
+ *
+ * react-native:
+ *  typeof document.createElement -> undefined
+ */
+function isStandardBrowserEnv() {
+  return (
+    typeof window !== 'undefined' &&
+    typeof document !== 'undefined' &&
+    typeof document.createElement === 'function'
+  );
+}
+
+/**
+ * Iterate over an Array or an Object invoking a function for each item.
+ *
+ * If `obj` is an Array callback will be called passing
+ * the value, index, and complete array for each item.
+ *
+ * If 'obj' is an Object callback will be called passing
+ * the value, key, and complete object for each property.
+ *
+ * @param {Object|Array} obj The object to iterate
+ * @param {Function} fn The callback to invoke for each item
+ */
+function forEach(obj, fn) {
+  // Don't bother if no value provided
+  if (obj === null || typeof obj === 'undefined') {
+    return;
+  }
+
+  // Force an array if not already something iterable
+  if (typeof obj !== 'object' && !isArray(obj)) {
+    /*eslint no-param-reassign:0*/
+    obj = [obj];
+  }
+
+  if (isArray(obj)) {
+    // Iterate over array values
+    for (var i = 0, l = obj.length; i < l; i++) {
+      fn.call(null, obj[i], i, obj);
+    }
+  } else {
+    // Iterate over object keys
+    for (var key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        fn.call(null, obj[key], key, obj);
+      }
+    }
+  }
+}
+
+/**
+ * Accepts varargs expecting each argument to be an object, then
+ * immutably merges the properties of each object and returns result.
+ *
+ * When multiple objects contain the same key the later object in
+ * the arguments list will take precedence.
+ *
+ * Example:
+ *
+ * ```js
+ * var result = merge({foo: 123}, {foo: 456});
+ * console.log(result.foo); // outputs 456
+ * ```
+ *
+ * @param {Object} obj1 Object to merge
+ * @returns {Object} Result of all merge properties
+ */
+function merge(/* obj1, obj2, obj3, ... */) {
+  var result = {};
+  function assignValue(val, key) {
+    if (typeof result[key] === 'object' && typeof val === 'object') {
+      result[key] = merge(result[key], val);
+    } else {
+      result[key] = val;
+    }
+  }
+
+  for (var i = 0, l = arguments.length; i < l; i++) {
+    forEach(arguments[i], assignValue);
+  }
+  return result;
+}
+
+/**
+ * Extends object a by mutably adding to it the properties of object b.
+ *
+ * @param {Object} a The object to be extended
+ * @param {Object} b The object to copy properties from
+ * @param {Object} thisArg The object to bind function to
+ * @return {Object} The resulting value of object a
+ */
+function extend(a, b, thisArg) {
+  forEach(b, function assignValue(val, key) {
+    if (thisArg && typeof val === 'function') {
+      a[key] = bind(val, thisArg);
+    } else {
+      a[key] = val;
+    }
+  });
+  return a;
+}
+
+module.exports = {
+  isArray: isArray,
+  isArrayBuffer: isArrayBuffer,
+  isFormData: isFormData,
+  isArrayBufferView: isArrayBufferView,
+  isString: isString,
+  isNumber: isNumber,
+  isObject: isObject,
+  isUndefined: isUndefined,
+  isDate: isDate,
+  isFile: isFile,
+  isBlob: isBlob,
+  isFunction: isFunction,
+  isStream: isStream,
+  isURLSearchParams: isURLSearchParams,
+  isStandardBrowserEnv: isStandardBrowserEnv,
+  forEach: forEach,
+  merge: merge,
+  extend: extend,
+  trim: trim
 };
-$.datepicker.setDefaults($.datepicker.regional['es']);
 
-$(".datepicker").datepicker();
-
-// SOLO NUMEROS
-$(document).on('keydown', '.solo-numero', function (event) {
-	if (event.shiftKey) {
-		return false;
-	}
-
-	if (event.keyCode == 46 || event.keyCode == 8 || event.keyCode == 9 || event.keyCode == 190) {
-		return true;
-	} else {
-		if (event.keyCode < 95) {
-			if (event.keyCode < 48 || event.keyCode > 57) {
-				return false;
-			}
-		} else {
-			if (event.keyCode < 96 || event.keyCode > 105) {
-				return false;
-			}
-		}
-	}
-});
-// END SOLO NUMEROS
-
-$(".set_username").change(function () {
-	var nombre = $('#name').val().toLowerCase();
-	var apellido = $('#last_name').val().toLowerCase();
-	if (nombre != '' && apellido != '') {
-		$('#username').val(nombre + '.' + apellido);
-	}
-});
-
-//cargar_tipo();
-
-$('#categoria').change(function () {
-	cargar_tipo();
-});
-
-function cargar_tipo() {
-	var categoria = document.getElementById("categoria").value;
-	var template = '';
-	if (categoria == 1) {
-		template = '\n\t\t<option value=\'papel higienico\'>PAPEL HIGI\xC9NICO</option>\n\t\t<option value=\'detergentes\'>DETERGENTES</option>\n\t\t<option value=\'limpieza de cocina\'>LIMPIEZA DE COCINA</option>\n\t\t<option value=\'ambientales\'>AMBIENTALES</option>\n\t\t<option value=\'pisos\'>PISOS</option>\n\t\t<option value=\'cloro\'>CLORO</option>\n\t\t<option value=\'servilletas\'>SERVILLETAS</option>\n\t\t<option value=\'cabello y manos\'>CABELLO Y MANOS</option>\n\t\t<option value=\'dental\'>DENTAL</option>\n\t\t<option value=\'proteccion femenina higienico\'>PROTECCI\xD3N FEMENINA</option>\n\t\t<option value=\'bebe\'>BEBE</option>';
-	} else if (categoria == 2) {
-		template = '\n\t\t<option value=\'abarrotes\'>ABARROTES</option>\n\t\t<option value=\'confites y galletas\'>CONFITES Y GALLETAS</option>\n\t\t<option value=\'bebestibles\'>BEBESTIBLES</option>';
-	} else if (categoria == 3) {
-		template = '\n\t\t<option value=\'comida para perros\'>COMIDA PARA PERROS</option>\n\t\t<option value=\'comida para gatos\'>COMIDA PARA GATOS</option>';
-	}
-	$('#tipo').empty().append(template);
-}
-
-// SEARCH
-
-function buscar(url, n) {
-	var template_error = '<div class="col-xs-12">\n\t<div class="alert alert-info">\n\tNO SE HAN ECONTRADO RESULTADOS.\n\t</div>\n\t</div>';
-	var loader = '<div class="col-xs-12 margin-top center">\n\t<img src="/distribuidoraRyM/public/images/loader.gif" />\n\t</div>';
-	$("#resultado").html(loader);
-	$.get(url, function (data) {
-		if (data.length) {
-			if (n == 1) $("#resultado").html(template_products(data));else if (n == 2) $("#resultado").html(template_users(data));else if (n == 3) $("#resultado").html(template_sales(data));
-		} else {
-			$("#resultado").html(template_error);
-		}
-	});
-}
-
-function url(url) {
-	return '/distribuidoraRyM/public/' + url;
-}
-
-$('#buscar-productos').click(function () {
-	var cod = $('#cod').val() ? $('#cod').val() : 'null';
-	var nombre = $('#nombre').val() ? $('#nombre').val() : 'null';
-	var categoria = $('#categoria').val() != '0' ? $('#categoria').val() : 'null';
-	if (cod != 'null' || nombre != 'null' || categoria != 'null') {
-		var _url = '/distribuidoraRyM/public/products/search/' + cod + '/' + nombre + '/' + categoria;
-		buscar(_url, 1);
-		$("#back").removeClass('hidden');
-		$("#paginacion").addClass('hidden');
-	}
-});
-
-function template_products(products) {
-	var token = $('meta[name="csrf-token"]').attr('content');
-	var template = '';
-	products.map(function (product) {
-		var image = product.image ? url(product.image) : url('images/no-image.jpg');
-		template += '\n\t\t  <div class="col-xs-6 col-md-3 product">\n\t\t    <div class="thumbnail">\n\t\t      <img src="' + image + '" alt="" class="product-image">\n\t\t      <div class="caption">\n\t\t        <a class="center" href="' + url('products/' + product.id) + '">\n\t\t        \t<h3>' + product.name + '</h3>\n\t\t        </a>\n\t\t        <div class="center">\n\t\t        \t<p>COD: ' + product.code + '</p>\n\t\t        \t<h4>$ ' + product.price + '</h4>\n\t\t        </div>\n\t\t        <table class="center center2">\n\t\t        \t<tr>\n\t\t        \t\t<td>\n\t\t        \t\t\t<a href="' + url('products/' + product.id + '/edit') + '" class="btn btn-warning" role="button">\n\t\t        \t\t\t\t<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>\n\t\t        \t\t\t\tEDITAR\n\t\t        \t\t\t</a>\n\t\t        \t\t</td>\n\t\t        \t\t<td>\n\t\t        \t\t\t<form method="POST" action="http://localhost/distribuidoraRyM/public/products/' + product.id + '" accept-charset="UTF-8">\n\t\t        \t\t\t\t<input name="_method" type="hidden" value="DELETE">\n\t\t\t\t\t\t\t\t\t\t<input name="_token" type="hidden" value="' + token + '">\n\t\t\t\t\t\t\t\t\t\t<button type="submit" class="btn btn-danger">\n\t\t\t\t\t\t\t\t\t\t\t<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>\n\t\t\t\t\t\t\t\t\t\t\tELIMINAR\n\t\t\t\t\t\t\t\t\t\t</button>\n\t\t\t\t\t\t\t\t\t</form>\n\t\t        \t\t</td>\n\t\t        \t</tr>\n\t\t        </table>\n\t\t      </div>\n\t\t    </div>\n\t\t  </div>';
-	});
-	return template;
-}
-
-$('button[id="buscar-usuarios"]').click(function () {
-	var email = $('#email').val() ? $('#email').val() : 'null';
-	var nombre = $('#nombre').val() ? $('#nombre').val() : 'null';
-	var priv = $('#privilegio').val() != '0' ? $('#privilegio').val() : 'null';
-	if (email != 'null' || nombre != 'null' || priv != 'null') {
-		var _url2 = '/distribuidoraRyM/public/users/search/' + nombre + '/' + email + '/' + priv;
-		buscar(_url2, 2);
-		$("#back").removeClass('hidden');
-		$("#paginacion").addClass('hidden');
-	}
-});
-
-function template_users(users) {
-	var token = $('meta[name="csrf-token"]').attr('content');
-	var template = '';
-	users.map(function (user) {
-		var image = user.image ? url(user.image) : url('images/no-image.jpg');
-		template += '\n\t\t  <div class="col-xs-6 col-md-3 product">\n\t\t    <div class="thumbnail">\n\t\t      <img src="' + image + '" alt="" class="profile-image">\n\t\t      <div class="caption">\n\t\t        <a class="center" href="' + url('users/' + user.id) + '">\n\t\t        \t<h3>' + user.name + ' ' + user.last_name + '</h3>\n\t\t        </a>\n\t\t        <div class="center">\n\t\t        \t<p>Privilegio: ' + user.rol.toUpperCase() + '</p>\n\t\t        \t<p>Usuario: ' + user.username + '</p>\n\t\t        \t<p>Email: ' + user.email + '</p>\n\t\t        </div>\n\t\t        <table class="center center2">\n\t\t        \t<tr>\n\t\t        \t\t<td>\n\t\t        \t\t\t<a href="' + url('users/' + user.id + '/edit') + '" class="btn btn-warning" role="button">\n\t\t        \t\t\t\t<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>\n\t\t        \t\t\t\tEDITAR\n\t\t        \t\t\t</a>\n\t\t        \t\t</td>\n\t\t        \t\t<td>\n\t\t        \t\t\t<form method="POST" action="http://localhost/distribuidoraRyM/public/users/' + user.id + '" accept-charset="UTF-8">\n\t\t        \t\t\t\t<input name="_method" type="hidden" value="DELETE">\n\t\t\t\t\t\t\t\t\t\t<input name="_token" type="hidden" value="' + token + '">\n\t\t\t\t\t\t\t\t\t\t<button type="submit" class="btn btn-danger">\n\t\t\t\t\t\t\t\t\t\t\t<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>\n\t\t\t\t\t\t\t\t\t\t\tELIMINAR\n\t\t\t\t\t\t\t\t\t\t</button>\n\t\t\t\t\t\t\t\t\t</form>\n\t\t        \t\t</td>\n\t\t        \t</tr>\n\t\t        </table>\n\t\t      </div>\n\t\t    </div>\n\t\t  </div>';
-	});
-	return template;
-}
-
-$('button[id="buscar-venta"]').click(function () {
-	var cod = $('#cod').val() ? $('#cod').val() : 'null';
-	var fecha = $('#fecha').val() ? $('#fecha').val() : 'null';
-	var vendedor = $('#vendedor').val() ? $('#vendedor').val() : 'null';
-	if (cod != 'null' || fecha != 'null' || vendedor != 'null') {
-		var _url3 = '/distribuidoraRyM/public/sales/search/' + cod + '/' + fecha + '/' + vendedor;
-		buscar(_url3, 3);
-		$("#back").removeClass('hidden');
-		$("#paginacion").addClass('hidden');
-	}
-});
-
-function template_sales(sales) {
-	var token = $('meta[name="csrf-token"]').attr('content');
-	var template = '';
-	sales.map(function (sale) {
-		template += '\n\t\t\t<tr>\n    \t\t<td>\n    \t\t\t<a href="' + url('/sales/' + sale.id) + '">\n    \t\t\t\t' + sale.id + '\n    \t\t\t</a>\n    \t\t</td>\n    \t\t<td>' + sale.created_at + '</td>\n    \t\t<td>$ ' + formatearNumero(sale.total) + '</td>\n    \t\t<td>' + sale.user.name + ' ' + sale.user.last_name + '</td>\n    \t\t<td>\n    \t\t\t<table>\n    \t\t\t\t<tr>\n    \t\t\t\t\t<td>\n    \t\t\t\t\t\t<a href="' + url('/sales/' + sale.id + '/edit') + '" class="btn btn-sm btn-warning margin-r">\n    \t\t\t\t\t\t\t<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>\n    \t\t\t\t\t\t\tEDITAR\n    \t\t\t\t\t\t</a>\n    \t\t\t\t\t</td>\n\t\t\t\t\t\t\t<td>\n\t        \t\t\t<form method="POST" action="http://localhost/distribuidoraRyM/public/sales/' + sale.id + '" accept-charset="UTF-8">\n\t        \t\t\t\t<input name="_method" type="hidden" value="DELETE">\n\t\t\t\t\t\t\t\t\t<input name="_token" type="hidden" value="' + token + '">\n\t\t\t\t\t\t\t\t\t<button type="submit" class="btn btn-danger">\n\t\t\t\t\t\t\t\t\t\t<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>\n\t\t\t\t\t\t\t\t\t\tELIMINAR\n\t\t\t\t\t\t\t\t\t</button>\n\t\t\t\t\t\t\t\t</form>\n\t        \t\t</td>\n    \t\t\t\t</tr>\n    \t\t\t</table>\n    \t\t</td>\n    \t</tr>\n\t\t';
-	});
-	var final_template = '\n\t\t<div class="col-xs-12">\n\t    <table class="table table-hover table-bordered table-striped center width sales">\n\t    \t<tr>\n\t    \t\t<th class="center">COD. VENTA</th>\n\t\t    \t<th class="center">FECHA VENTA</th>\n\t\t    \t<th class="center">TOTAL</th>\n\t\t    \t<th class="center">VENDEDOR</th>\n\t\t    \t<th class="center" style="width: 50px">ACCIONES</th>\n\t    \t</tr>\n\t    \t' + template + '\n\t    </table>\n\t  </div>\n\t';
-	return final_template;
-}
-
-// CASH
-
-$(document).on('click', 'button[name="agregar"]', function () {
-	var n = $('#products').val();
-	var cod = $('#cod').val();
-	var cant = $('#cantidad').val();
-	if (cod != '' && cant != '') {
-		var _url4 = '/distribuidoraRyM/public/products/search/' + cod + '/null/null';
-		buscar_producto(_url4, cant, n);
-	}
-	$('#cod').val('').focus();
-	$('#cantidad').val('');
-});
-
-function buscar_producto(url, cant, n) {
-	$.get(url, function (data) {
-		if (data.length) {
-			add_product(data[0], cant, n);
-			$('#sale').removeClass('hidden');
-			$('#button-sale').removeClass('hidden');
-		} else {
-			alert("No se encontró el producto");
-		}
-	});
-}
-
-function add_product(product, cant, n) {
-	var total = cant * product.price;
-	var data = [product.code, product.name, product.price, cant, total];
-	var nuevaFila = '<tr id="row-' + n + '">';
-	for (var i = 0; i <= 5; i++) {
-		if (i == 0) nuevaFila += '<td class="center"><input type="text" value="' + product.id + '" name="id-' + n + '" class="hidden"/>' + data[i] + '</td>';else if (i == 3) nuevaFila += '<td class="center"><input type="text" value="' + data[i] + '" name="cant-' + n + '" class="hidden"/>' + formatearNumero(data[i]) + '</td>';else if (i === 4) {
-			setTotal(data[i]);
-			nuevaFila += '<td class="center"><input type="text" value="' + data[i] + '" name="total-' + n + '" id="total-' + n + '" class="hidden"/>' + formatearNumero(data[i]) + '</td>';
-		} else if (i == 5) nuevaFila += '<td class="center"><button class="btn btn-danger borrar" id="' + n + '"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button></td>';else nuevaFila += '<td class="center">' + data[i] + '</td>';
-	}
-	nuevaFila += "</tr>";
-	$("#productos").append(nuevaFila);
-	n++;
-	$("#products").val(n);
-}
-
-function setTotal(num) {
-	var total = $('#total').html();
-	total = new Number(total.replace(/\./g, ''));
-	total += num;
-	total = formatearNumero(total);
-	$('#total').html(total);
-}
-
-function resetTotal(i) {
-	var num = new Number($('#total-' + i).val());
-	var total = $('#total').html();
-	total = new Number(total.replace(/\./g, ''));
-	total = total - num;
-	total = formatearNumero(total);
-	$('#total').html(total);
-}
-
-$(document).on('click', '.borrar', function (event) {
-	event.preventDefault();
-	var i = $(this).attr('id');
-	resetTotal(i);
-	$(this).closest('tr').remove();
-	var n = $('#products').val();
-	n--;
-	if (n < 1) {
-		$('#sale').addClass('hidden');
-		$('#button-sale').addClass('hidden');
-	}
-	$("#products").val(n);
-});
-
-function formatearNumero(nStr) {
-	nStr += '';
-	x = nStr.split('.');
-	x1 = x[0];
-	x2 = x.length > 1 ? ',' + x[1] : '';
-	var rgx = /(\d+)(\d{3})/;
-	while (rgx.test(x1)) {
-		x1 = x1.replace(rgx, '$1' + '.' + '$2');
-	}
-	return x1 + x2;
-}
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-// removed by extract-text-webpack-plugin
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var utils = __webpack_require__(0);
+var normalizeHeaderName = __webpack_require__(25);
+
+var PROTECTION_PREFIX = /^\)\]\}',?\n/;
+var DEFAULT_CONTENT_TYPE = {
+  'Content-Type': 'application/x-www-form-urlencoded'
+};
+
+function setContentTypeIfUnset(headers, value) {
+  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
+    headers['Content-Type'] = value;
+  }
+}
+
+function getDefaultAdapter() {
+  var adapter;
+  if (typeof XMLHttpRequest !== 'undefined') {
+    // For browsers use XHR adapter
+    adapter = __webpack_require__(2);
+  } else if (typeof process !== 'undefined') {
+    // For node use HTTP adapter
+    adapter = __webpack_require__(2);
+  }
+  return adapter;
+}
+
+var defaults = {
+  adapter: getDefaultAdapter(),
+
+  transformRequest: [function transformRequest(data, headers) {
+    normalizeHeaderName(headers, 'Content-Type');
+    if (utils.isFormData(data) ||
+      utils.isArrayBuffer(data) ||
+      utils.isStream(data) ||
+      utils.isFile(data) ||
+      utils.isBlob(data)
+    ) {
+      return data;
+    }
+    if (utils.isArrayBufferView(data)) {
+      return data.buffer;
+    }
+    if (utils.isURLSearchParams(data)) {
+      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
+      return data.toString();
+    }
+    if (utils.isObject(data)) {
+      setContentTypeIfUnset(headers, 'application/json;charset=utf-8');
+      return JSON.stringify(data);
+    }
+    return data;
+  }],
+
+  transformResponse: [function transformResponse(data) {
+    /*eslint no-param-reassign:0*/
+    if (typeof data === 'string') {
+      data = data.replace(PROTECTION_PREFIX, '');
+      try {
+        data = JSON.parse(data);
+      } catch (e) { /* Ignore */ }
+    }
+    return data;
+  }],
+
+  timeout: 0,
+
+  xsrfCookieName: 'XSRF-TOKEN',
+  xsrfHeaderName: 'X-XSRF-TOKEN',
+
+  maxContentLength: -1,
+
+  validateStatus: function validateStatus(status) {
+    return status >= 200 && status < 300;
+  }
+};
+
+defaults.headers = {
+  common: {
+    'Accept': 'application/json, text/plain, */*'
+  }
+};
+
+utils.forEach(['delete', 'get', 'head'], function forEachMehtodNoData(method) {
+  defaults.headers[method] = {};
+});
+
+utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
+});
+
+module.exports = defaults;
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(34)))
 
 /***/ }),
 /* 2 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+"use strict";
 
-/*! ========================================================================
- * Bootstrap Toggle: bootstrap-toggle.js v2.2.0
- * http://www.bootstraptoggle.com
- * ========================================================================
- * Copyright 2014 Min Hur, The New York Times Company
- * Licensed under MIT
- * ======================================================================== */
-+function (a) {
-  "use strict";
-  function b(b) {
-    return this.each(function () {
-      var d = a(this),
-          e = d.data("bs.toggle"),
-          f = "object" == (typeof b === "undefined" ? "undefined" : _typeof(b)) && b;e || d.data("bs.toggle", e = new c(this, f)), "string" == typeof b && e[b] && e[b]();
-    });
-  }var c = function c(b, _c) {
-    this.$element = a(b), this.options = a.extend({}, this.defaults(), _c), this.render();
-  };c.VERSION = "2.2.0", c.DEFAULTS = { on: "On", off: "Off", onstyle: "primary", offstyle: "default", size: "normal", style: "", width: null, height: null }, c.prototype.defaults = function () {
-    return { on: this.$element.attr("data-on") || c.DEFAULTS.on, off: this.$element.attr("data-off") || c.DEFAULTS.off, onstyle: this.$element.attr("data-onstyle") || c.DEFAULTS.onstyle, offstyle: this.$element.attr("data-offstyle") || c.DEFAULTS.offstyle, size: this.$element.attr("data-size") || c.DEFAULTS.size, style: this.$element.attr("data-style") || c.DEFAULTS.style, width: this.$element.attr("data-width") || c.DEFAULTS.width, height: this.$element.attr("data-height") || c.DEFAULTS.height };
-  }, c.prototype.render = function () {
-    this._onstyle = "btn-" + this.options.onstyle, this._offstyle = "btn-" + this.options.offstyle;var b = "large" === this.options.size ? "btn-lg" : "small" === this.options.size ? "btn-sm" : "mini" === this.options.size ? "btn-xs" : "",
-        c = a('<label class="btn">').html(this.options.on).addClass(this._onstyle + " " + b),
-        d = a('<label class="btn">').html(this.options.off).addClass(this._offstyle + " " + b + " active"),
-        e = a('<span class="toggle-handle btn btn-default">').addClass(b),
-        f = a('<div class="toggle-group">').append(c, d, e),
-        g = a('<div class="toggle btn" data-toggle="toggle">').addClass(this.$element.prop("checked") ? this._onstyle : this._offstyle + " off").addClass(b).addClass(this.options.style);this.$element.wrap(g), a.extend(this, { $toggle: this.$element.parent(), $toggleOn: c, $toggleOff: d, $toggleGroup: f }), this.$toggle.append(f);var h = this.options.width || Math.max(c.outerWidth(), d.outerWidth()) + e.outerWidth() / 2,
-        i = this.options.height || Math.max(c.outerHeight(), d.outerHeight());c.addClass("toggle-on"), d.addClass("toggle-off"), this.$toggle.css({ width: h, height: i }), this.options.height && (c.css("line-height", c.height() + "px"), d.css("line-height", d.height() + "px")), this.update(!0), this.trigger(!0);
-  }, c.prototype.toggle = function () {
-    this.$element.prop("checked") ? this.off() : this.on();
-  }, c.prototype.on = function (a) {
-    return this.$element.prop("disabled") ? !1 : (this.$toggle.removeClass(this._offstyle + " off").addClass(this._onstyle), this.$element.prop("checked", !0), void (a || this.trigger()));
-  }, c.prototype.off = function (a) {
-    return this.$element.prop("disabled") ? !1 : (this.$toggle.removeClass(this._onstyle).addClass(this._offstyle + " off"), this.$element.prop("checked", !1), void (a || this.trigger()));
-  }, c.prototype.enable = function () {
-    this.$toggle.removeAttr("disabled"), this.$element.prop("disabled", !1);
-  }, c.prototype.disable = function () {
-    this.$toggle.attr("disabled", "disabled"), this.$element.prop("disabled", !0);
-  }, c.prototype.update = function (a) {
-    this.$element.prop("disabled") ? this.disable() : this.enable(), this.$element.prop("checked") ? this.on(a) : this.off(a);
-  }, c.prototype.trigger = function (b) {
-    this.$element.off("change.bs.toggle"), b || this.$element.change(), this.$element.on("change.bs.toggle", a.proxy(function () {
-      this.update();
-    }, this));
-  }, c.prototype.destroy = function () {
-    this.$element.off("change.bs.toggle"), this.$toggleGroup.remove(), this.$element.removeData("bs.toggle"), this.$element.unwrap();
-  };var d = a.fn.bootstrapToggle;a.fn.bootstrapToggle = b, a.fn.bootstrapToggle.Constructor = c, a.fn.toggle.noConflict = function () {
-    return a.fn.bootstrapToggle = d, this;
-  }, a(function () {
-    a("input[type=checkbox][data-toggle^=toggle]").bootstrapToggle();
-  }), a(document).on("click.bs.toggle", "div[data-toggle^=toggle]", function (b) {
-    var c = a(this).find("input[type=checkbox]");c.bootstrapToggle("toggle"), b.preventDefault();
+
+var utils = __webpack_require__(0);
+var settle = __webpack_require__(17);
+var buildURL = __webpack_require__(20);
+var parseHeaders = __webpack_require__(26);
+var isURLSameOrigin = __webpack_require__(24);
+var createError = __webpack_require__(5);
+var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(19);
+
+module.exports = function xhrAdapter(config) {
+  return new Promise(function dispatchXhrRequest(resolve, reject) {
+    var requestData = config.data;
+    var requestHeaders = config.headers;
+
+    if (utils.isFormData(requestData)) {
+      delete requestHeaders['Content-Type']; // Let the browser set it
+    }
+
+    var request = new XMLHttpRequest();
+    var loadEvent = 'onreadystatechange';
+    var xDomain = false;
+
+    // For IE 8/9 CORS support
+    // Only supports POST and GET calls and doesn't returns the response headers.
+    // DON'T do this for testing b/c XMLHttpRequest is mocked, not XDomainRequest.
+    if ("development" !== 'test' &&
+        typeof window !== 'undefined' &&
+        window.XDomainRequest && !('withCredentials' in request) &&
+        !isURLSameOrigin(config.url)) {
+      request = new window.XDomainRequest();
+      loadEvent = 'onload';
+      xDomain = true;
+      request.onprogress = function handleProgress() {};
+      request.ontimeout = function handleTimeout() {};
+    }
+
+    // HTTP basic authentication
+    if (config.auth) {
+      var username = config.auth.username || '';
+      var password = config.auth.password || '';
+      requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
+    }
+
+    request.open(config.method.toUpperCase(), buildURL(config.url, config.params, config.paramsSerializer), true);
+
+    // Set the request timeout in MS
+    request.timeout = config.timeout;
+
+    // Listen for ready state
+    request[loadEvent] = function handleLoad() {
+      if (!request || (request.readyState !== 4 && !xDomain)) {
+        return;
+      }
+
+      // The request errored out and we didn't get a response, this will be
+      // handled by onerror instead
+      // With one exception: request that using file: protocol, most browsers
+      // will return status as 0 even though it's a successful request
+      if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
+        return;
+      }
+
+      // Prepare the response
+      var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
+      var responseData = !config.responseType || config.responseType === 'text' ? request.responseText : request.response;
+      var response = {
+        data: responseData,
+        // IE sends 1223 instead of 204 (https://github.com/mzabriskie/axios/issues/201)
+        status: request.status === 1223 ? 204 : request.status,
+        statusText: request.status === 1223 ? 'No Content' : request.statusText,
+        headers: responseHeaders,
+        config: config,
+        request: request
+      };
+
+      settle(resolve, reject, response);
+
+      // Clean up request
+      request = null;
+    };
+
+    // Handle low level network errors
+    request.onerror = function handleError() {
+      // Real errors are hidden from us by the browser
+      // onerror should only fire if it's a network error
+      reject(createError('Network Error', config));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Handle timeout
+    request.ontimeout = function handleTimeout() {
+      reject(createError('timeout of ' + config.timeout + 'ms exceeded', config, 'ECONNABORTED'));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Add xsrf header
+    // This is only done if running in a standard browser environment.
+    // Specifically not if we're in a web worker, or react-native.
+    if (utils.isStandardBrowserEnv()) {
+      var cookies = __webpack_require__(22);
+
+      // Add xsrf header
+      var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
+          cookies.read(config.xsrfCookieName) :
+          undefined;
+
+      if (xsrfValue) {
+        requestHeaders[config.xsrfHeaderName] = xsrfValue;
+      }
+    }
+
+    // Add headers to the request
+    if ('setRequestHeader' in request) {
+      utils.forEach(requestHeaders, function setRequestHeader(val, key) {
+        if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
+          // Remove Content-Type if data is undefined
+          delete requestHeaders[key];
+        } else {
+          // Otherwise add header to the request
+          request.setRequestHeader(key, val);
+        }
+      });
+    }
+
+    // Add withCredentials to request if needed
+    if (config.withCredentials) {
+      request.withCredentials = true;
+    }
+
+    // Add responseType to request if needed
+    if (config.responseType) {
+      try {
+        request.responseType = config.responseType;
+      } catch (e) {
+        if (request.responseType !== 'json') {
+          throw e;
+        }
+      }
+    }
+
+    // Handle progress if needed
+    if (typeof config.onDownloadProgress === 'function') {
+      request.addEventListener('progress', config.onDownloadProgress);
+    }
+
+    // Not all browsers support upload events
+    if (typeof config.onUploadProgress === 'function' && request.upload) {
+      request.upload.addEventListener('progress', config.onUploadProgress);
+    }
+
+    if (config.cancelToken) {
+      // Handle cancellation
+      config.cancelToken.promise.then(function onCanceled(cancel) {
+        if (!request) {
+          return;
+        }
+
+        request.abort();
+        reject(cancel);
+        // Clean up request
+        request = null;
+      });
+    }
+
+    if (requestData === undefined) {
+      requestData = null;
+    }
+
+    // Send the request
+    request.send(requestData);
   });
-}(jQuery);
-//# sourceMappingURL=bootstrap-toggle.min.js.map
+};
+
 
 /***/ }),
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(0);
-module.exports = __webpack_require__(1);
+"use strict";
+
+
+/**
+ * A `Cancel` is an object that is thrown when an operation is canceled.
+ *
+ * @class
+ * @param {string=} message The message.
+ */
+function Cancel(message) {
+  this.message = message;
+}
+
+Cancel.prototype.toString = function toString() {
+  return 'Cancel' + (this.message ? ': ' + this.message : '');
+};
+
+Cancel.prototype.__CANCEL__ = true;
+
+module.exports = Cancel;
 
 
 /***/ }),
-/* 4 */,
-/* 5 */,
-/* 6 */,
-/* 7 */,
-/* 8 */
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = function isCancel(value) {
+  return !!(value && value.__CANCEL__);
+};
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var enhanceError = __webpack_require__(16);
+
+/**
+ * Create an Error with the specified message, config, error code, and response.
+ *
+ * @param {string} message The error message.
+ * @param {Object} config The config.
+ * @param {string} [code] The error code (for example, 'ECONNABORTED').
+ @ @param {Object} [response] The response.
+ * @returns {Error} The created error.
+ */
+module.exports = function createError(message, config, code, response) {
+  var error = new Error(message);
+  return enhanceError(error, config, code, response);
+};
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = function bind(fn, thisArg) {
+  return function wrap() {
+    var args = new Array(arguments.length);
+    for (var i = 0; i < args.length; i++) {
+      args[i] = arguments[i];
+    }
+    return fn.apply(thisArg, args);
+  };
+};
+
+
+/***/ }),
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -10661,9 +10998,1561 @@ return jQuery;
 
 
 /***/ }),
-/* 9 */,
-/* 10 */,
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(29);
+__webpack_require__(28);
+__webpack_require__(31);
+__webpack_require__(30);
+
+$('#rol').bootstrapToggle({
+	on: 'Administrador',
+	off: 'Cajero'
+});
+
+// DATAPICKER
+$.datepicker.regional['es'] = {
+	closeText: 'Cerrar',
+	prevText: '<Ant',
+	nextText: 'Sig>',
+	currentText: 'Hoy',
+	monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+	monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+	dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+	dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mié', 'Juv', 'Vie', 'Sáb'],
+	dayNamesMin: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'],
+	weekHeader: 'Sm',
+	dateFormat: 'dd-mm-yy',
+	firstDay: 1,
+	isRTL: false,
+	showMonthAfterYear: false,
+	yearSuffix: ''
+};
+$.datepicker.setDefaults($.datepicker.regional['es']);
+
+$(".datepicker").datepicker();
+
+// SOLO NUMEROS
+$(document).on('keydown', '.solo-numero', function (event) {
+	if (event.shiftKey) {
+		return false;
+	}
+
+	if (event.keyCode == 46 || event.keyCode == 8 || event.keyCode == 9 || event.keyCode == 190) {
+		return true;
+	} else {
+		if (event.keyCode < 95) {
+			if (event.keyCode < 48 || event.keyCode > 57) {
+				return false;
+			}
+		} else {
+			if (event.keyCode < 96 || event.keyCode > 105) {
+				return false;
+			}
+		}
+	}
+});
+// END SOLO NUMEROS
+
+$(".set_username").change(function () {
+	var nombre = $('#name').val().toLowerCase();
+	var apellido = $('#last_name').val().toLowerCase();
+	if (nombre != '' && apellido != '') {
+		$('#username').val(nombre + '.' + apellido);
+	}
+});
+
+//cargar_tipo();
+
+$('#categoria').change(function () {
+	cargar_tipo();
+});
+
+function cargar_tipo() {
+	var categoria = document.getElementById("categoria").value;
+	var template = '';
+	if (categoria == 1) {
+		template = '\n\t\t<option value=\'papel higienico\'>PAPEL HIGI\xC9NICO</option>\n\t\t<option value=\'detergentes\'>DETERGENTES</option>\n\t\t<option value=\'limpieza de cocina\'>LIMPIEZA DE COCINA</option>\n\t\t<option value=\'ambientales\'>AMBIENTALES</option>\n\t\t<option value=\'pisos\'>PISOS</option>\n\t\t<option value=\'cloro\'>CLORO</option>\n\t\t<option value=\'servilletas\'>SERVILLETAS</option>\n\t\t<option value=\'cabello y manos\'>CABELLO Y MANOS</option>\n\t\t<option value=\'dental\'>DENTAL</option>\n\t\t<option value=\'proteccion femenina higienico\'>PROTECCI\xD3N FEMENINA</option>\n\t\t<option value=\'bebe\'>BEBE</option>';
+	} else if (categoria == 2) {
+		template = '\n\t\t<option value=\'abarrotes\'>ABARROTES</option>\n\t\t<option value=\'confites y galletas\'>CONFITES Y GALLETAS</option>\n\t\t<option value=\'bebestibles\'>BEBESTIBLES</option>';
+	} else if (categoria == 3) {
+		template = '\n\t\t<option value=\'comida para perros\'>COMIDA PARA PERROS</option>\n\t\t<option value=\'comida para gatos\'>COMIDA PARA GATOS</option>';
+	}
+	$('#tipo').empty().append(template);
+}
+
+// SEARCH
+
+function buscar(url, n) {
+	var template_error = '<div class="col-xs-12">\n\t<div class="alert alert-info">\n\tNO SE HAN ECONTRADO RESULTADOS.\n\t</div>\n\t</div>';
+	var loader = '<div class="col-xs-12 margin-top center">\n\t<img src="/distribuidoraRyM/public/images/loader.gif" />\n\t</div>';
+	$("#resultado").html(loader);
+	$.get(url, function (data) {
+		if (data.length) {
+			if (n == 1) $("#resultado").html(template_products(data));else if (n == 2) $("#resultado").html(template_users(data));else if (n == 3) $("#resultado").html(template_sales(data));
+		} else {
+			$("#resultado").html(template_error);
+		}
+	});
+}
+
+function url(url) {
+	return '/distribuidoraRyM/public/' + url;
+}
+
+$('#buscar-productos').click(function () {
+	var cod = $('#cod').val() ? $('#cod').val() : 'null';
+	var nombre = $('#nombre').val() ? $('#nombre').val() : 'null';
+	var categoria = $('#categoria').val() != '0' ? $('#categoria').val() : 'null';
+	if (cod != 'null' || nombre != 'null' || categoria != 'null') {
+		var _url = '/distribuidoraRyM/public/products/search/' + cod + '/' + nombre + '/' + categoria;
+		buscar(_url, 1);
+		$("#back").removeClass('hidden');
+		$("#paginacion").addClass('hidden');
+	}
+});
+
+function template_products(products) {
+	var token = $('meta[name="csrf-token"]').attr('content');
+	var template = '';
+	products.map(function (product) {
+		var image = product.image ? url(product.image) : url('images/no-image.jpg');
+		template += '\n\t\t  <div class="col-xs-6 col-md-3 product">\n\t\t    <div class="thumbnail">\n\t\t      <img src="' + image + '" alt="" class="product-image">\n\t\t      <div class="caption">\n\t\t        <a class="center" href="' + url('products/' + product.id) + '">\n\t\t        \t<h3>' + product.name + '</h3>\n\t\t        </a>\n\t\t        <div class="center">\n\t\t        \t<p>COD: ' + product.code + '</p>\n\t\t        \t<h4>$ ' + product.price + '</h4>\n\t\t        </div>\n\t\t        <table class="center center2">\n\t\t        \t<tr>\n\t\t        \t\t<td>\n\t\t        \t\t\t<a href="' + url('products/' + product.id + '/edit') + '" class="btn btn-warning" role="button">\n\t\t        \t\t\t\t<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>\n\t\t        \t\t\t\tEDITAR\n\t\t        \t\t\t</a>\n\t\t        \t\t</td>\n\t\t        \t\t<td>\n\t\t        \t\t\t<form method="POST" action="http://localhost/distribuidoraRyM/public/products/' + product.id + '" accept-charset="UTF-8">\n\t\t        \t\t\t\t<input name="_method" type="hidden" value="DELETE">\n\t\t\t\t\t\t\t\t\t\t<input name="_token" type="hidden" value="' + token + '">\n\t\t\t\t\t\t\t\t\t\t<button type="submit" class="btn btn-danger">\n\t\t\t\t\t\t\t\t\t\t\t<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>\n\t\t\t\t\t\t\t\t\t\t\tELIMINAR\n\t\t\t\t\t\t\t\t\t\t</button>\n\t\t\t\t\t\t\t\t\t</form>\n\t\t        \t\t</td>\n\t\t        \t</tr>\n\t\t        </table>\n\t\t      </div>\n\t\t    </div>\n\t\t  </div>';
+	});
+	return template;
+}
+
+$('button[id="buscar-usuarios"]').click(function () {
+	var email = $('#email').val() ? $('#email').val() : 'null';
+	var nombre = $('#nombre').val() ? $('#nombre').val() : 'null';
+	var priv = $('#privilegio').val() != '0' ? $('#privilegio').val() : 'null';
+	if (email != 'null' || nombre != 'null' || priv != 'null') {
+		var _url2 = '/distribuidoraRyM/public/users/search/' + nombre + '/' + email + '/' + priv;
+		buscar(_url2, 2);
+		$("#back").removeClass('hidden');
+		$("#paginacion").addClass('hidden');
+	}
+});
+
+function template_users(users) {
+	var token = $('meta[name="csrf-token"]').attr('content');
+	var template = '';
+	users.map(function (user) {
+		var image = user.image ? url(user.image) : url('images/no-image.jpg');
+		template += '\n\t\t  <div class="col-xs-6 col-md-3 product">\n\t\t    <div class="thumbnail">\n\t\t      <img src="' + image + '" alt="" class="profile-image">\n\t\t      <div class="caption">\n\t\t        <a class="center" href="' + url('users/' + user.id) + '">\n\t\t        \t<h3>' + user.name + ' ' + user.last_name + '</h3>\n\t\t        </a>\n\t\t        <div class="center">\n\t\t        \t<p>Privilegio: ' + user.rol.toUpperCase() + '</p>\n\t\t        \t<p>Usuario: ' + user.username + '</p>\n\t\t        \t<p>Email: ' + user.email + '</p>\n\t\t        </div>\n\t\t        <table class="center center2">\n\t\t        \t<tr>\n\t\t        \t\t<td>\n\t\t        \t\t\t<a href="' + url('users/' + user.id + '/edit') + '" class="btn btn-warning" role="button">\n\t\t        \t\t\t\t<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>\n\t\t        \t\t\t\tEDITAR\n\t\t        \t\t\t</a>\n\t\t        \t\t</td>\n\t\t        \t\t<td>\n\t\t        \t\t\t<form method="POST" action="http://localhost/distribuidoraRyM/public/users/' + user.id + '" accept-charset="UTF-8">\n\t\t        \t\t\t\t<input name="_method" type="hidden" value="DELETE">\n\t\t\t\t\t\t\t\t\t\t<input name="_token" type="hidden" value="' + token + '">\n\t\t\t\t\t\t\t\t\t\t<button type="submit" class="btn btn-danger">\n\t\t\t\t\t\t\t\t\t\t\t<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>\n\t\t\t\t\t\t\t\t\t\t\tELIMINAR\n\t\t\t\t\t\t\t\t\t\t</button>\n\t\t\t\t\t\t\t\t\t</form>\n\t\t        \t\t</td>\n\t\t        \t</tr>\n\t\t        </table>\n\t\t      </div>\n\t\t    </div>\n\t\t  </div>';
+	});
+	return template;
+}
+
+$('button[id="buscar-venta"]').click(function () {
+	var cod = $('#cod').val() ? $('#cod').val() : 'null';
+	var fecha = $('#fecha').val() ? $('#fecha').val() : 'null';
+	var vendedor = $('#vendedor').val() ? $('#vendedor').val() : 'null';
+	if (cod != 'null' || fecha != 'null' || vendedor != 'null') {
+		var _url3 = '/distribuidoraRyM/public/sales/search/' + cod + '/' + fecha + '/' + vendedor;
+		buscar(_url3, 3);
+		$("#back").removeClass('hidden');
+		$("#paginacion").addClass('hidden');
+	}
+});
+
+function template_sales(sales) {
+	var token = $('meta[name="csrf-token"]').attr('content');
+	var template = '';
+	sales.map(function (sale) {
+		template += '\n\t\t\t<tr>\n    \t\t<td>\n    \t\t\t<a href="' + url('/sales/' + sale.id) + '">\n    \t\t\t\t' + sale.id + '\n    \t\t\t</a>\n    \t\t</td>\n    \t\t<td>' + sale.created_at + '</td>\n    \t\t<td>$ ' + formatearNumero(sale.total) + '</td>\n    \t\t<td>' + sale.user.name + ' ' + sale.user.last_name + '</td>\n    \t\t<td>\n    \t\t\t<table>\n    \t\t\t\t<tr>\n    \t\t\t\t\t<td>\n    \t\t\t\t\t\t<a href="' + url('/sales/' + sale.id + '/edit') + '" class="btn btn-sm btn-warning margin-r">\n    \t\t\t\t\t\t\t<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>\n    \t\t\t\t\t\t\tEDITAR\n    \t\t\t\t\t\t</a>\n    \t\t\t\t\t</td>\n\t\t\t\t\t\t\t<td>\n\t        \t\t\t<form method="POST" action="http://localhost/distribuidoraRyM/public/sales/' + sale.id + '" accept-charset="UTF-8">\n\t        \t\t\t\t<input name="_method" type="hidden" value="DELETE">\n\t\t\t\t\t\t\t\t\t<input name="_token" type="hidden" value="' + token + '">\n\t\t\t\t\t\t\t\t\t<button type="submit" class="btn btn-danger">\n\t\t\t\t\t\t\t\t\t\t<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>\n\t\t\t\t\t\t\t\t\t\tELIMINAR\n\t\t\t\t\t\t\t\t\t</button>\n\t\t\t\t\t\t\t\t</form>\n\t        \t\t</td>\n    \t\t\t\t</tr>\n    \t\t\t</table>\n    \t\t</td>\n    \t</tr>\n\t\t';
+	});
+	var final_template = '\n\t\t<div class="col-xs-12">\n\t    <table class="table table-hover table-bordered table-striped center width sales">\n\t    \t<tr>\n\t    \t\t<th class="center">COD. VENTA</th>\n\t\t    \t<th class="center">FECHA VENTA</th>\n\t\t    \t<th class="center">TOTAL</th>\n\t\t    \t<th class="center">VENDEDOR</th>\n\t\t    \t<th class="center" style="width: 50px">ACCIONES</th>\n\t    \t</tr>\n\t    \t' + template + '\n\t    </table>\n\t  </div>\n\t';
+	return final_template;
+}
+
+// CASH
+
+$(document).on('click', 'button[name="agregar"]', function () {
+	var n = $('#products').val();
+	var cod = $('#cod').val();
+	var cant = $('#cantidad').val();
+	if (cod != '' && cant != '') {
+		var _url4 = '/distribuidoraRyM/public/products/search/' + cod + '/null/null';
+		buscar_producto(_url4, cant, n);
+	}
+	$('#cod').val('').focus();
+	$('#cantidad').val('');
+});
+
+function buscar_producto(url, cant, n) {
+	$.get(url, function (data) {
+		if (data.length) {
+			add_product(data[0], cant, n);
+			$('#sale').removeClass('hidden');
+			$('#button-sale').removeClass('hidden');
+		} else {
+			alert("No se encontró el producto");
+		}
+	});
+}
+
+function add_product(product, cant, n) {
+	var total = cant * product.price;
+	var data = [product.code, product.name, product.price, cant, total];
+	var nuevaFila = '<tr id="row-' + n + '">';
+	for (var i = 0; i <= 5; i++) {
+		if (i == 0) nuevaFila += '<td class="center"><input type="text" value="' + product.id + '" name="id-' + n + '" class="hidden"/>' + data[i] + '</td>';else if (i == 3) nuevaFila += '<td class="center"><input type="text" value="' + data[i] + '" name="cant-' + n + '" class="hidden"/>' + formatearNumero(data[i]) + '</td>';else if (i === 4) {
+			setTotal(data[i]);
+			nuevaFila += '<td class="center"><input type="text" value="' + data[i] + '" name="total-' + n + '" id="total-' + n + '" class="hidden"/>' + formatearNumero(data[i]) + '</td>';
+		} else if (i == 5) nuevaFila += '<td class="center"><button class="btn btn-danger borrar" id="' + n + '"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button></td>';else nuevaFila += '<td class="center">' + data[i] + '</td>';
+	}
+	nuevaFila += "</tr>";
+	$("#productos").append(nuevaFila);
+	n++;
+	$("#products").val(n);
+}
+
+function setTotal(num) {
+	var total = $('#total').html();
+	total = new Number(total.replace(/\./g, ''));
+	total += num;
+	total = formatearNumero(total);
+	$('#total').html(total);
+}
+
+function resetTotal(i) {
+	var num = new Number($('#total-' + i).val());
+	var total = $('#total').html();
+	total = new Number(total.replace(/\./g, ''));
+	total = total - num;
+	total = formatearNumero(total);
+	$('#total').html(total);
+}
+
+$(document).on('click', '.borrar', function (event) {
+	event.preventDefault();
+	var i = $(this).attr('id');
+	resetTotal(i);
+	$(this).closest('tr').remove();
+	var n = $('#products').val();
+	n--;
+	if (n < 1) {
+		$('#sale').addClass('hidden');
+		$('#button-sale').addClass('hidden');
+	}
+	$("#products").val(n);
+});
+
+function formatearNumero(nStr) {
+	nStr += '';
+	x = nStr.split('.');
+	x1 = x[0];
+	x2 = x.length > 1 ? ',' + x[1] : '';
+	var rgx = /(\d+)(\d{3})/;
+	while (rgx.test(x1)) {
+		x1 = x1.replace(rgx, '$1' + '.' + '$2');
+	}
+	return x1 + x2;
+}
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(11);
+
+/***/ }),
 /* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(0);
+var bind = __webpack_require__(6);
+var Axios = __webpack_require__(13);
+var defaults = __webpack_require__(1);
+
+/**
+ * Create an instance of Axios
+ *
+ * @param {Object} defaultConfig The default config for the instance
+ * @return {Axios} A new instance of Axios
+ */
+function createInstance(defaultConfig) {
+  var context = new Axios(defaultConfig);
+  var instance = bind(Axios.prototype.request, context);
+
+  // Copy axios.prototype to instance
+  utils.extend(instance, Axios.prototype, context);
+
+  // Copy context to instance
+  utils.extend(instance, context);
+
+  return instance;
+}
+
+// Create the default instance to be exported
+var axios = createInstance(defaults);
+
+// Expose Axios class to allow class inheritance
+axios.Axios = Axios;
+
+// Factory for creating new instances
+axios.create = function create(instanceConfig) {
+  return createInstance(utils.merge(defaults, instanceConfig));
+};
+
+// Expose Cancel & CancelToken
+axios.Cancel = __webpack_require__(3);
+axios.CancelToken = __webpack_require__(12);
+axios.isCancel = __webpack_require__(4);
+
+// Expose all/spread
+axios.all = function all(promises) {
+  return Promise.all(promises);
+};
+axios.spread = __webpack_require__(27);
+
+module.exports = axios;
+
+// Allow use of default import syntax in TypeScript
+module.exports.default = axios;
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var Cancel = __webpack_require__(3);
+
+/**
+ * A `CancelToken` is an object that can be used to request cancellation of an operation.
+ *
+ * @class
+ * @param {Function} executor The executor function.
+ */
+function CancelToken(executor) {
+  if (typeof executor !== 'function') {
+    throw new TypeError('executor must be a function.');
+  }
+
+  var resolvePromise;
+  this.promise = new Promise(function promiseExecutor(resolve) {
+    resolvePromise = resolve;
+  });
+
+  var token = this;
+  executor(function cancel(message) {
+    if (token.reason) {
+      // Cancellation has already been requested
+      return;
+    }
+
+    token.reason = new Cancel(message);
+    resolvePromise(token.reason);
+  });
+}
+
+/**
+ * Throws a `Cancel` if cancellation has been requested.
+ */
+CancelToken.prototype.throwIfRequested = function throwIfRequested() {
+  if (this.reason) {
+    throw this.reason;
+  }
+};
+
+/**
+ * Returns an object that contains a new `CancelToken` and a function that, when called,
+ * cancels the `CancelToken`.
+ */
+CancelToken.source = function source() {
+  var cancel;
+  var token = new CancelToken(function executor(c) {
+    cancel = c;
+  });
+  return {
+    token: token,
+    cancel: cancel
+  };
+};
+
+module.exports = CancelToken;
+
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var defaults = __webpack_require__(1);
+var utils = __webpack_require__(0);
+var InterceptorManager = __webpack_require__(14);
+var dispatchRequest = __webpack_require__(15);
+var isAbsoluteURL = __webpack_require__(23);
+var combineURLs = __webpack_require__(21);
+
+/**
+ * Create a new instance of Axios
+ *
+ * @param {Object} instanceConfig The default config for the instance
+ */
+function Axios(instanceConfig) {
+  this.defaults = instanceConfig;
+  this.interceptors = {
+    request: new InterceptorManager(),
+    response: new InterceptorManager()
+  };
+}
+
+/**
+ * Dispatch a request
+ *
+ * @param {Object} config The config specific for this request (merged with this.defaults)
+ */
+Axios.prototype.request = function request(config) {
+  /*eslint no-param-reassign:0*/
+  // Allow for axios('example/url'[, config]) a la fetch API
+  if (typeof config === 'string') {
+    config = utils.merge({
+      url: arguments[0]
+    }, arguments[1]);
+  }
+
+  config = utils.merge(defaults, this.defaults, { method: 'get' }, config);
+
+  // Support baseURL config
+  if (config.baseURL && !isAbsoluteURL(config.url)) {
+    config.url = combineURLs(config.baseURL, config.url);
+  }
+
+  // Hook up interceptors middleware
+  var chain = [dispatchRequest, undefined];
+  var promise = Promise.resolve(config);
+
+  this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
+    chain.unshift(interceptor.fulfilled, interceptor.rejected);
+  });
+
+  this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
+    chain.push(interceptor.fulfilled, interceptor.rejected);
+  });
+
+  while (chain.length) {
+    promise = promise.then(chain.shift(), chain.shift());
+  }
+
+  return promise;
+};
+
+// Provide aliases for supported request methods
+utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
+  /*eslint func-names:0*/
+  Axios.prototype[method] = function(url, config) {
+    return this.request(utils.merge(config || {}, {
+      method: method,
+      url: url
+    }));
+  };
+});
+
+utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+  /*eslint func-names:0*/
+  Axios.prototype[method] = function(url, data, config) {
+    return this.request(utils.merge(config || {}, {
+      method: method,
+      url: url,
+      data: data
+    }));
+  };
+});
+
+module.exports = Axios;
+
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(0);
+
+function InterceptorManager() {
+  this.handlers = [];
+}
+
+/**
+ * Add a new interceptor to the stack
+ *
+ * @param {Function} fulfilled The function to handle `then` for a `Promise`
+ * @param {Function} rejected The function to handle `reject` for a `Promise`
+ *
+ * @return {Number} An ID used to remove interceptor later
+ */
+InterceptorManager.prototype.use = function use(fulfilled, rejected) {
+  this.handlers.push({
+    fulfilled: fulfilled,
+    rejected: rejected
+  });
+  return this.handlers.length - 1;
+};
+
+/**
+ * Remove an interceptor from the stack
+ *
+ * @param {Number} id The ID that was returned by `use`
+ */
+InterceptorManager.prototype.eject = function eject(id) {
+  if (this.handlers[id]) {
+    this.handlers[id] = null;
+  }
+};
+
+/**
+ * Iterate over all the registered interceptors
+ *
+ * This method is particularly useful for skipping over any
+ * interceptors that may have become `null` calling `eject`.
+ *
+ * @param {Function} fn The function to call for each interceptor
+ */
+InterceptorManager.prototype.forEach = function forEach(fn) {
+  utils.forEach(this.handlers, function forEachHandler(h) {
+    if (h !== null) {
+      fn(h);
+    }
+  });
+};
+
+module.exports = InterceptorManager;
+
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(0);
+var transformData = __webpack_require__(18);
+var isCancel = __webpack_require__(4);
+var defaults = __webpack_require__(1);
+
+/**
+ * Throws a `Cancel` if cancellation has been requested.
+ */
+function throwIfCancellationRequested(config) {
+  if (config.cancelToken) {
+    config.cancelToken.throwIfRequested();
+  }
+}
+
+/**
+ * Dispatch a request to the server using the configured adapter.
+ *
+ * @param {object} config The config that is to be used for the request
+ * @returns {Promise} The Promise to be fulfilled
+ */
+module.exports = function dispatchRequest(config) {
+  throwIfCancellationRequested(config);
+
+  // Ensure headers exist
+  config.headers = config.headers || {};
+
+  // Transform request data
+  config.data = transformData(
+    config.data,
+    config.headers,
+    config.transformRequest
+  );
+
+  // Flatten headers
+  config.headers = utils.merge(
+    config.headers.common || {},
+    config.headers[config.method] || {},
+    config.headers || {}
+  );
+
+  utils.forEach(
+    ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
+    function cleanHeaderConfig(method) {
+      delete config.headers[method];
+    }
+  );
+
+  var adapter = config.adapter || defaults.adapter;
+
+  return adapter(config).then(function onAdapterResolution(response) {
+    throwIfCancellationRequested(config);
+
+    // Transform response data
+    response.data = transformData(
+      response.data,
+      response.headers,
+      config.transformResponse
+    );
+
+    return response;
+  }, function onAdapterRejection(reason) {
+    if (!isCancel(reason)) {
+      throwIfCancellationRequested(config);
+
+      // Transform response data
+      if (reason && reason.response) {
+        reason.response.data = transformData(
+          reason.response.data,
+          reason.response.headers,
+          config.transformResponse
+        );
+      }
+    }
+
+    return Promise.reject(reason);
+  });
+};
+
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * Update an Error with the specified config, error code, and response.
+ *
+ * @param {Error} error The error to update.
+ * @param {Object} config The config.
+ * @param {string} [code] The error code (for example, 'ECONNABORTED').
+ @ @param {Object} [response] The response.
+ * @returns {Error} The error.
+ */
+module.exports = function enhanceError(error, config, code, response) {
+  error.config = config;
+  if (code) {
+    error.code = code;
+  }
+  error.response = response;
+  return error;
+};
+
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var createError = __webpack_require__(5);
+
+/**
+ * Resolve or reject a Promise based on response status.
+ *
+ * @param {Function} resolve A function that resolves the promise.
+ * @param {Function} reject A function that rejects the promise.
+ * @param {object} response The response.
+ */
+module.exports = function settle(resolve, reject, response) {
+  var validateStatus = response.config.validateStatus;
+  // Note: status is not exposed by XDomainRequest
+  if (!response.status || !validateStatus || validateStatus(response.status)) {
+    resolve(response);
+  } else {
+    reject(createError(
+      'Request failed with status code ' + response.status,
+      response.config,
+      null,
+      response
+    ));
+  }
+};
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(0);
+
+/**
+ * Transform the data for a request or a response
+ *
+ * @param {Object|String} data The data to be transformed
+ * @param {Array} headers The headers for the request or response
+ * @param {Array|Function} fns A single function or Array of functions
+ * @returns {*} The resulting transformed data
+ */
+module.exports = function transformData(data, headers, fns) {
+  /*eslint no-param-reassign:0*/
+  utils.forEach(fns, function transform(fn) {
+    data = fn(data, headers);
+  });
+
+  return data;
+};
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// btoa polyfill for IE<10 courtesy https://github.com/davidchambers/Base64.js
+
+var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+
+function E() {
+  this.message = 'String contains an invalid character';
+}
+E.prototype = new Error;
+E.prototype.code = 5;
+E.prototype.name = 'InvalidCharacterError';
+
+function btoa(input) {
+  var str = String(input);
+  var output = '';
+  for (
+    // initialize result and counter
+    var block, charCode, idx = 0, map = chars;
+    // if the next str index does not exist:
+    //   change the mapping table to "="
+    //   check if d has no fractional digits
+    str.charAt(idx | 0) || (map = '=', idx % 1);
+    // "8 - idx % 1 * 8" generates the sequence 2, 4, 6, 8
+    output += map.charAt(63 & block >> 8 - idx % 1 * 8)
+  ) {
+    charCode = str.charCodeAt(idx += 3 / 4);
+    if (charCode > 0xFF) {
+      throw new E();
+    }
+    block = block << 8 | charCode;
+  }
+  return output;
+}
+
+module.exports = btoa;
+
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(0);
+
+function encode(val) {
+  return encodeURIComponent(val).
+    replace(/%40/gi, '@').
+    replace(/%3A/gi, ':').
+    replace(/%24/g, '$').
+    replace(/%2C/gi, ',').
+    replace(/%20/g, '+').
+    replace(/%5B/gi, '[').
+    replace(/%5D/gi, ']');
+}
+
+/**
+ * Build a URL by appending params to the end
+ *
+ * @param {string} url The base of the url (e.g., http://www.google.com)
+ * @param {object} [params] The params to be appended
+ * @returns {string} The formatted url
+ */
+module.exports = function buildURL(url, params, paramsSerializer) {
+  /*eslint no-param-reassign:0*/
+  if (!params) {
+    return url;
+  }
+
+  var serializedParams;
+  if (paramsSerializer) {
+    serializedParams = paramsSerializer(params);
+  } else if (utils.isURLSearchParams(params)) {
+    serializedParams = params.toString();
+  } else {
+    var parts = [];
+
+    utils.forEach(params, function serialize(val, key) {
+      if (val === null || typeof val === 'undefined') {
+        return;
+      }
+
+      if (utils.isArray(val)) {
+        key = key + '[]';
+      }
+
+      if (!utils.isArray(val)) {
+        val = [val];
+      }
+
+      utils.forEach(val, function parseValue(v) {
+        if (utils.isDate(v)) {
+          v = v.toISOString();
+        } else if (utils.isObject(v)) {
+          v = JSON.stringify(v);
+        }
+        parts.push(encode(key) + '=' + encode(v));
+      });
+    });
+
+    serializedParams = parts.join('&');
+  }
+
+  if (serializedParams) {
+    url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
+  }
+
+  return url;
+};
+
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * Creates a new URL by combining the specified URLs
+ *
+ * @param {string} baseURL The base URL
+ * @param {string} relativeURL The relative URL
+ * @returns {string} The combined URL
+ */
+module.exports = function combineURLs(baseURL, relativeURL) {
+  return baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '');
+};
+
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(0);
+
+module.exports = (
+  utils.isStandardBrowserEnv() ?
+
+  // Standard browser envs support document.cookie
+  (function standardBrowserEnv() {
+    return {
+      write: function write(name, value, expires, path, domain, secure) {
+        var cookie = [];
+        cookie.push(name + '=' + encodeURIComponent(value));
+
+        if (utils.isNumber(expires)) {
+          cookie.push('expires=' + new Date(expires).toGMTString());
+        }
+
+        if (utils.isString(path)) {
+          cookie.push('path=' + path);
+        }
+
+        if (utils.isString(domain)) {
+          cookie.push('domain=' + domain);
+        }
+
+        if (secure === true) {
+          cookie.push('secure');
+        }
+
+        document.cookie = cookie.join('; ');
+      },
+
+      read: function read(name) {
+        var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
+        return (match ? decodeURIComponent(match[3]) : null);
+      },
+
+      remove: function remove(name) {
+        this.write(name, '', Date.now() - 86400000);
+      }
+    };
+  })() :
+
+  // Non standard browser env (web workers, react-native) lack needed support.
+  (function nonStandardBrowserEnv() {
+    return {
+      write: function write() {},
+      read: function read() { return null; },
+      remove: function remove() {}
+    };
+  })()
+);
+
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * Determines whether the specified URL is absolute
+ *
+ * @param {string} url The URL to test
+ * @returns {boolean} True if the specified URL is absolute, otherwise false
+ */
+module.exports = function isAbsoluteURL(url) {
+  // A URL is considered absolute if it begins with "<scheme>://" or "//" (protocol-relative URL).
+  // RFC 3986 defines scheme name as a sequence of characters beginning with a letter and followed
+  // by any combination of letters, digits, plus, period, or hyphen.
+  return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
+};
+
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(0);
+
+module.exports = (
+  utils.isStandardBrowserEnv() ?
+
+  // Standard browser envs have full support of the APIs needed to test
+  // whether the request URL is of the same origin as current location.
+  (function standardBrowserEnv() {
+    var msie = /(msie|trident)/i.test(navigator.userAgent);
+    var urlParsingNode = document.createElement('a');
+    var originURL;
+
+    /**
+    * Parse a URL to discover it's components
+    *
+    * @param {String} url The URL to be parsed
+    * @returns {Object}
+    */
+    function resolveURL(url) {
+      var href = url;
+
+      if (msie) {
+        // IE needs attribute set twice to normalize properties
+        urlParsingNode.setAttribute('href', href);
+        href = urlParsingNode.href;
+      }
+
+      urlParsingNode.setAttribute('href', href);
+
+      // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
+      return {
+        href: urlParsingNode.href,
+        protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
+        host: urlParsingNode.host,
+        search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
+        hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
+        hostname: urlParsingNode.hostname,
+        port: urlParsingNode.port,
+        pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
+                  urlParsingNode.pathname :
+                  '/' + urlParsingNode.pathname
+      };
+    }
+
+    originURL = resolveURL(window.location.href);
+
+    /**
+    * Determine if a URL shares the same origin as the current location
+    *
+    * @param {String} requestURL The URL to test
+    * @returns {boolean} True if URL shares the same origin, otherwise false
+    */
+    return function isURLSameOrigin(requestURL) {
+      var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
+      return (parsed.protocol === originURL.protocol &&
+            parsed.host === originURL.host);
+    };
+  })() :
+
+  // Non standard browser envs (web workers, react-native) lack needed support.
+  (function nonStandardBrowserEnv() {
+    return function isURLSameOrigin() {
+      return true;
+    };
+  })()
+);
+
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(0);
+
+module.exports = function normalizeHeaderName(headers, normalizedName) {
+  utils.forEach(headers, function processHeader(value, name) {
+    if (name !== normalizedName && name.toUpperCase() === normalizedName.toUpperCase()) {
+      headers[normalizedName] = value;
+      delete headers[name];
+    }
+  });
+};
+
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(0);
+
+/**
+ * Parse headers into an object
+ *
+ * ```
+ * Date: Wed, 27 Aug 2014 08:58:49 GMT
+ * Content-Type: application/json
+ * Connection: keep-alive
+ * Transfer-Encoding: chunked
+ * ```
+ *
+ * @param {String} headers Headers needing to be parsed
+ * @returns {Object} Headers parsed into an object
+ */
+module.exports = function parseHeaders(headers) {
+  var parsed = {};
+  var key;
+  var val;
+  var i;
+
+  if (!headers) { return parsed; }
+
+  utils.forEach(headers.split('\n'), function parser(line) {
+    i = line.indexOf(':');
+    key = utils.trim(line.substr(0, i)).toLowerCase();
+    val = utils.trim(line.substr(i + 1));
+
+    if (key) {
+      parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
+    }
+  });
+
+  return parsed;
+};
+
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * Syntactic sugar for invoking a function and expanding an array for arguments.
+ *
+ * Common use case would be to use `Function.prototype.apply`.
+ *
+ *  ```js
+ *  function f(x, y, z) {}
+ *  var args = [1, 2, 3];
+ *  f.apply(null, args);
+ *  ```
+ *
+ * With `spread` this example can be re-written.
+ *
+ *  ```js
+ *  spread(function(x, y, z) {})([1, 2, 3]);
+ *  ```
+ *
+ * @param {Function} callback
+ * @returns {Function}
+ */
+module.exports = function spread(callback) {
+  return function wrap(arr) {
+    return callback.apply(null, arr);
+  };
+};
+
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports) {
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+/*! ========================================================================
+ * Bootstrap Toggle: bootstrap-toggle.js v2.2.0
+ * http://www.bootstraptoggle.com
+ * ========================================================================
+ * Copyright 2014 Min Hur, The New York Times Company
+ * Licensed under MIT
+ * ======================================================================== */
++function (a) {
+  "use strict";
+  function b(b) {
+    return this.each(function () {
+      var d = a(this),
+          e = d.data("bs.toggle"),
+          f = "object" == (typeof b === "undefined" ? "undefined" : _typeof(b)) && b;e || d.data("bs.toggle", e = new c(this, f)), "string" == typeof b && e[b] && e[b]();
+    });
+  }var c = function c(b, _c) {
+    this.$element = a(b), this.options = a.extend({}, this.defaults(), _c), this.render();
+  };c.VERSION = "2.2.0", c.DEFAULTS = { on: "On", off: "Off", onstyle: "primary", offstyle: "default", size: "normal", style: "", width: null, height: null }, c.prototype.defaults = function () {
+    return { on: this.$element.attr("data-on") || c.DEFAULTS.on, off: this.$element.attr("data-off") || c.DEFAULTS.off, onstyle: this.$element.attr("data-onstyle") || c.DEFAULTS.onstyle, offstyle: this.$element.attr("data-offstyle") || c.DEFAULTS.offstyle, size: this.$element.attr("data-size") || c.DEFAULTS.size, style: this.$element.attr("data-style") || c.DEFAULTS.style, width: this.$element.attr("data-width") || c.DEFAULTS.width, height: this.$element.attr("data-height") || c.DEFAULTS.height };
+  }, c.prototype.render = function () {
+    this._onstyle = "btn-" + this.options.onstyle, this._offstyle = "btn-" + this.options.offstyle;var b = "large" === this.options.size ? "btn-lg" : "small" === this.options.size ? "btn-sm" : "mini" === this.options.size ? "btn-xs" : "",
+        c = a('<label class="btn">').html(this.options.on).addClass(this._onstyle + " " + b),
+        d = a('<label class="btn">').html(this.options.off).addClass(this._offstyle + " " + b + " active"),
+        e = a('<span class="toggle-handle btn btn-default">').addClass(b),
+        f = a('<div class="toggle-group">').append(c, d, e),
+        g = a('<div class="toggle btn" data-toggle="toggle">').addClass(this.$element.prop("checked") ? this._onstyle : this._offstyle + " off").addClass(b).addClass(this.options.style);this.$element.wrap(g), a.extend(this, { $toggle: this.$element.parent(), $toggleOn: c, $toggleOff: d, $toggleGroup: f }), this.$toggle.append(f);var h = this.options.width || Math.max(c.outerWidth(), d.outerWidth()) + e.outerWidth() / 2,
+        i = this.options.height || Math.max(c.outerHeight(), d.outerHeight());c.addClass("toggle-on"), d.addClass("toggle-off"), this.$toggle.css({ width: h, height: i }), this.options.height && (c.css("line-height", c.height() + "px"), d.css("line-height", d.height() + "px")), this.update(!0), this.trigger(!0);
+  }, c.prototype.toggle = function () {
+    this.$element.prop("checked") ? this.off() : this.on();
+  }, c.prototype.on = function (a) {
+    return this.$element.prop("disabled") ? !1 : (this.$toggle.removeClass(this._offstyle + " off").addClass(this._onstyle), this.$element.prop("checked", !0), void (a || this.trigger()));
+  }, c.prototype.off = function (a) {
+    return this.$element.prop("disabled") ? !1 : (this.$toggle.removeClass(this._onstyle).addClass(this._offstyle + " off"), this.$element.prop("checked", !1), void (a || this.trigger()));
+  }, c.prototype.enable = function () {
+    this.$toggle.removeAttr("disabled"), this.$element.prop("disabled", !1);
+  }, c.prototype.disable = function () {
+    this.$toggle.attr("disabled", "disabled"), this.$element.prop("disabled", !0);
+  }, c.prototype.update = function (a) {
+    this.$element.prop("disabled") ? this.disable() : this.enable(), this.$element.prop("checked") ? this.on(a) : this.off(a);
+  }, c.prototype.trigger = function (b) {
+    this.$element.off("change.bs.toggle"), b || this.$element.change(), this.$element.on("change.bs.toggle", a.proxy(function () {
+      this.update();
+    }, this));
+  }, c.prototype.destroy = function () {
+    this.$element.off("change.bs.toggle"), this.$toggleGroup.remove(), this.$element.removeData("bs.toggle"), this.$element.unwrap();
+  };var d = a.fn.bootstrapToggle;a.fn.bootstrapToggle = b, a.fn.bootstrapToggle.Constructor = c, a.fn.toggle.noConflict = function () {
+    return a.fn.bootstrapToggle = d, this;
+  }, a(function () {
+    a("input[type=checkbox][data-toggle^=toggle]").bootstrapToggle();
+  }), a(document).on("click.bs.toggle", "div[data-toggle^=toggle]", function (b) {
+    var c = a(this).find("input[type=checkbox]");c.bootstrapToggle("toggle"), b.preventDefault();
+  });
+}(jQuery);
+//# sourceMappingURL=bootstrap-toggle.min.js.map
+
+/***/ }),
+/* 29 */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+window._ = __webpack_require__(33);
+
+/**
+ * We'll load jQuery and the Bootstrap jQuery plugin which provides support
+ * for JavaScript based Bootstrap features such as modals and tabs. This
+ * code may be modified to fit the specific needs of your application.
+ */
+
+try {
+  window.$ = window.jQuery = __webpack_require__(7);
+
+  __webpack_require__(32);
+} catch (e) {}
+
+/**
+ * We'll load the axios HTTP library which allows us to easily issue requests
+ * to our Laravel back-end. This library automatically handles sending the
+ * CSRF token as a header based on the value of the "XSRF" token cookie.
+ */
+
+window.axios = __webpack_require__(10);
+
+window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+
+/**
+ * Next we will register the CSRF Token as a common header with Axios so that
+ * all outgoing HTTP requests automatically have it attached. This is just
+ * a simple convenience so we don't have to attach every token manually.
+ */
+
+var token = document.head.querySelector('meta[name="csrf-token"]');
+
+if (token) {
+  window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+} else {
+  console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
+}
+
+/**
+ * Echo exposes an expressive API for subscribing to channels and listening
+ * for events that are broadcast by Laravel. Echo and event broadcasting
+ * allows your team to easily build robust real-time web applications.
+ */
+
+// import Echo from 'laravel-echo'
+
+// window.Pusher = require('pusher-js');
+
+// window.Echo = new Echo({
+//     broadcaster: 'pusher',
+//     key: 'your-pusher-key'
+// });
+
+/***/ }),
+/* 30 */
+/***/ (function(module, exports) {
+
+/**
+ * Resize function without multiple trigger
+ * 
+ * Usage:
+ * $(window).smartresize(function(){  
+ *     // code here
+ * });
+ */
+(function ($, sr) {
+    // debouncing function from John Hann
+    // http://unscriptable.com/index.php/2009/03/20/debouncing-javascript-methods/
+    var debounce = function debounce(func, threshold, execAsap) {
+        var timeout;
+
+        return function debounced() {
+            var obj = this,
+                args = arguments;
+            function delayed() {
+                if (!execAsap) func.apply(obj, args);
+                timeout = null;
+            }
+
+            if (timeout) clearTimeout(timeout);else if (execAsap) func.apply(obj, args);
+
+            timeout = setTimeout(delayed, threshold || 100);
+        };
+    };
+
+    // smartresize 
+    jQuery.fn[sr] = function (fn) {
+        return fn ? this.bind('resize', debounce(fn)) : this.trigger(sr);
+    };
+})(jQuery, 'smartresize');
+/**
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+var CURRENT_URL = window.location.href.split('#')[0].split('?')[0],
+    $BODY = $('body'),
+    $MENU_TOGGLE = $('#menu_toggle'),
+    $SIDEBAR_MENU = $('#sidebar-menu'),
+    $SIDEBAR_FOOTER = $('.sidebar-footer'),
+    $LEFT_COL = $('.left_col'),
+    $RIGHT_COL = $('.right_col'),
+    $NAV_MENU = $('.nav_menu'),
+    $FOOTER = $('footer');
+
+// Sidebar
+function init_sidebar() {
+    // TODO: This is some kind of easy fix, maybe we can improve this
+    var setContentHeight = function setContentHeight() {
+        // reset height
+        $RIGHT_COL.css('min-height', $(window).height());
+
+        var bodyHeight = $BODY.outerHeight(),
+            footerHeight = $BODY.hasClass('footer_fixed') ? -10 : $FOOTER.height(),
+            leftColHeight = $LEFT_COL.eq(1).height() + $SIDEBAR_FOOTER.height(),
+            contentHeight = bodyHeight < leftColHeight ? leftColHeight : bodyHeight;
+
+        // normalize content
+        contentHeight -= $NAV_MENU.height() + footerHeight;
+
+        $RIGHT_COL.css('min-height', contentHeight);
+    };
+
+    $SIDEBAR_MENU.find('a').on('click', function (ev) {
+        console.log('clicked - sidebar_menu');
+        var $li = $(this).parent();
+
+        if ($li.is('.active')) {
+            $li.removeClass('active active-sm');
+            $('ul:first', $li).slideUp(function () {
+                setContentHeight();
+            });
+        } else {
+            // prevent closing menu if we are on child menu
+            if (!$li.parent().is('.child_menu')) {
+                $SIDEBAR_MENU.find('li').removeClass('active active-sm');
+                $SIDEBAR_MENU.find('li ul').slideUp();
+            } else {
+                if ($BODY.is(".nav-sm")) {
+                    $SIDEBAR_MENU.find("li").removeClass("active active-sm");
+                    $SIDEBAR_MENU.find("li ul").slideUp();
+                }
+            }
+            $li.addClass('active');
+
+            $('ul:first', $li).slideDown(function () {
+                setContentHeight();
+            });
+        }
+    });
+
+    // toggle small or large menu 
+    $MENU_TOGGLE.on('click', function () {
+        console.log('clicked - menu toggle');
+
+        if ($BODY.hasClass('nav-md')) {
+            $SIDEBAR_MENU.find('li.active ul').hide();
+            $SIDEBAR_MENU.find('li.active').addClass('active-sm').removeClass('active');
+        } else {
+            $SIDEBAR_MENU.find('li.active-sm ul').show();
+            $SIDEBAR_MENU.find('li.active-sm').addClass('active').removeClass('active-sm');
+        }
+
+        $BODY.toggleClass('nav-md nav-sm');
+
+        setContentHeight();
+
+        $('.dataTable').each(function () {
+            $(this).dataTable().fnDraw();
+        });
+    });
+
+    // check active menu
+    $SIDEBAR_MENU.find('a[href="' + CURRENT_URL + '"]').parent('li').addClass('current-page');
+
+    $SIDEBAR_MENU.find('a').filter(function () {
+        return this.href == CURRENT_URL;
+    }).parent('li').addClass('current-page').parents('ul').slideDown(function () {
+        setContentHeight();
+    }).parent().addClass('active');
+
+    // recompute content when resizing
+    $(window).smartresize(function () {
+        setContentHeight();
+    });
+
+    setContentHeight();
+
+    // fixed sidebar
+    if ($.fn.mCustomScrollbar) {
+        $('.menu_fixed').mCustomScrollbar({
+            autoHideScrollbar: true,
+            theme: 'minimal',
+            mouseWheel: { preventDefault: true }
+        });
+    }
+};
+// /Sidebar
+
+var randNum = function randNum() {
+    return Math.floor(Math.random() * (1 + 40 - 20)) + 20;
+};
+
+// Panel toolbox
+$(document).ready(function () {
+    $('.collapse-link').on('click', function () {
+        var $BOX_PANEL = $(this).closest('.x_panel'),
+            $ICON = $(this).find('i'),
+            $BOX_CONTENT = $BOX_PANEL.find('.x_content');
+
+        // fix for some div with hardcoded fix class
+        if ($BOX_PANEL.attr('style')) {
+            $BOX_CONTENT.slideToggle(200, function () {
+                $BOX_PANEL.removeAttr('style');
+            });
+        } else {
+            $BOX_CONTENT.slideToggle(200);
+            $BOX_PANEL.css('height', 'auto');
+        }
+
+        $ICON.toggleClass('fa-chevron-up fa-chevron-down');
+    });
+
+    $('.close-link').click(function () {
+        var $BOX_PANEL = $(this).closest('.x_panel');
+
+        $BOX_PANEL.remove();
+    });
+});
+// /Panel toolbox
+
+// Tooltip
+$(document).ready(function () {
+    $('[data-toggle="tooltip"]').tooltip({
+        container: 'body'
+    });
+});
+// /Tooltip
+
+// Progressbar
+if ($(".progress .progress-bar")[0]) {
+    $('.progress .progress-bar').progressbar();
+}
+// /Progressbar
+
+// Switchery
+$(document).ready(function () {
+    if ($(".js-switch")[0]) {
+        var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
+        elems.forEach(function (html) {
+            var switchery = new Switchery(html, {
+                color: '#26B99A'
+            });
+        });
+    }
+});
+// /Switchery
+
+
+// iCheck
+$(document).ready(function () {
+    if ($("input.flat")[0]) {
+        $(document).ready(function () {
+            $('input.flat').iCheck({
+                checkboxClass: 'icheckbox_flat-green',
+                radioClass: 'iradio_flat-green'
+            });
+        });
+    }
+});
+// /iCheck
+
+// Table
+$('table input').on('ifChecked', function () {
+    checkState = '';
+    $(this).parent().parent().parent().addClass('selected');
+    countChecked();
+});
+$('table input').on('ifUnchecked', function () {
+    checkState = '';
+    $(this).parent().parent().parent().removeClass('selected');
+    countChecked();
+});
+
+var checkState = '';
+
+$('.bulk_action input').on('ifChecked', function () {
+    checkState = '';
+    $(this).parent().parent().parent().addClass('selected');
+    countChecked();
+});
+$('.bulk_action input').on('ifUnchecked', function () {
+    checkState = '';
+    $(this).parent().parent().parent().removeClass('selected');
+    countChecked();
+});
+$('.bulk_action input#check-all').on('ifChecked', function () {
+    checkState = 'all';
+    countChecked();
+});
+$('.bulk_action input#check-all').on('ifUnchecked', function () {
+    checkState = 'none';
+    countChecked();
+});
+
+function countChecked() {
+    if (checkState === 'all') {
+        $(".bulk_action input[name='table_records']").iCheck('check');
+    }
+    if (checkState === 'none') {
+        $(".bulk_action input[name='table_records']").iCheck('uncheck');
+    }
+
+    var checkCount = $(".bulk_action input[name='table_records']:checked").length;
+
+    if (checkCount) {
+        $('.column-title').hide();
+        $('.bulk-actions').show();
+        $('.action-cnt').html(checkCount + ' Records Selected');
+    } else {
+        $('.column-title').show();
+        $('.bulk-actions').hide();
+    }
+}
+
+// Accordion
+$(document).ready(function () {
+    $(".expand").on("click", function () {
+        $(this).next().slideToggle(200);
+        $expand = $(this).find(">:first-child");
+
+        if ($expand.text() == "+") {
+            $expand.text("-");
+        } else {
+            $expand.text("+");
+        }
+    });
+});
+
+// NProgress
+if (typeof NProgress != 'undefined') {
+    $(document).ready(function () {
+        NProgress.start();
+    });
+
+    $(window).load(function () {
+        NProgress.done();
+    });
+}
+
+//hover and retain popover when on popover content
+var originalLeave = $.fn.popover.Constructor.prototype.leave;
+$.fn.popover.Constructor.prototype.leave = function (obj) {
+    var self = obj instanceof this.constructor ? obj : $(obj.currentTarget)[this.type](this.getDelegateOptions()).data('bs.' + this.type);
+    var container, timeout;
+
+    originalLeave.call(this, obj);
+
+    if (obj.currentTarget) {
+        container = $(obj.currentTarget).siblings('.popover');
+        timeout = self.timeout;
+        container.one('mouseenter', function () {
+            //We entered the actual popover – call off the dogs
+            clearTimeout(timeout);
+            //Let's monitor popover content instead
+            container.one('mouseleave', function () {
+                $.fn.popover.Constructor.prototype.leave.call(self, self);
+            });
+        });
+    }
+};
+
+$('body').popover({
+    selector: '[data-popover]',
+    trigger: 'click hover',
+    delay: {
+        show: 50,
+        hide: 400
+    }
+});
+
+$(document).ready(function () {
+    init_sidebar();
+});
+
+/***/ }),
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -10674,7 +12563,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 * Copyright jQuery Foundation and other contributors; Licensed MIT */
 
 (function (t) {
-   true ? !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(8)], __WEBPACK_AMD_DEFINE_FACTORY__ = (t),
+   true ? !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(7)], __WEBPACK_AMD_DEFINE_FACTORY__ = (t),
 				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
 				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)) : t(jQuery);
@@ -12017,1577 +13906,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 });
 
 /***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var bind = __webpack_require__(18);
-
-/*global toString:true*/
-
-// utils is a library of generic helper functions non-specific to axios
-
-var toString = Object.prototype.toString;
-
-/**
- * Determine if a value is an Array
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an Array, otherwise false
- */
-function isArray(val) {
-  return toString.call(val) === '[object Array]';
-}
-
-/**
- * Determine if a value is an ArrayBuffer
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an ArrayBuffer, otherwise false
- */
-function isArrayBuffer(val) {
-  return toString.call(val) === '[object ArrayBuffer]';
-}
-
-/**
- * Determine if a value is a FormData
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an FormData, otherwise false
- */
-function isFormData(val) {
-  return (typeof FormData !== 'undefined') && (val instanceof FormData);
-}
-
-/**
- * Determine if a value is a view on an ArrayBuffer
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a view on an ArrayBuffer, otherwise false
- */
-function isArrayBufferView(val) {
-  var result;
-  if ((typeof ArrayBuffer !== 'undefined') && (ArrayBuffer.isView)) {
-    result = ArrayBuffer.isView(val);
-  } else {
-    result = (val) && (val.buffer) && (val.buffer instanceof ArrayBuffer);
-  }
-  return result;
-}
-
-/**
- * Determine if a value is a String
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a String, otherwise false
- */
-function isString(val) {
-  return typeof val === 'string';
-}
-
-/**
- * Determine if a value is a Number
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Number, otherwise false
- */
-function isNumber(val) {
-  return typeof val === 'number';
-}
-
-/**
- * Determine if a value is undefined
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if the value is undefined, otherwise false
- */
-function isUndefined(val) {
-  return typeof val === 'undefined';
-}
-
-/**
- * Determine if a value is an Object
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an Object, otherwise false
- */
-function isObject(val) {
-  return val !== null && typeof val === 'object';
-}
-
-/**
- * Determine if a value is a Date
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Date, otherwise false
- */
-function isDate(val) {
-  return toString.call(val) === '[object Date]';
-}
-
-/**
- * Determine if a value is a File
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a File, otherwise false
- */
-function isFile(val) {
-  return toString.call(val) === '[object File]';
-}
-
-/**
- * Determine if a value is a Blob
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Blob, otherwise false
- */
-function isBlob(val) {
-  return toString.call(val) === '[object Blob]';
-}
-
-/**
- * Determine if a value is a Function
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Function, otherwise false
- */
-function isFunction(val) {
-  return toString.call(val) === '[object Function]';
-}
-
-/**
- * Determine if a value is a Stream
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Stream, otherwise false
- */
-function isStream(val) {
-  return isObject(val) && isFunction(val.pipe);
-}
-
-/**
- * Determine if a value is a URLSearchParams object
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a URLSearchParams object, otherwise false
- */
-function isURLSearchParams(val) {
-  return typeof URLSearchParams !== 'undefined' && val instanceof URLSearchParams;
-}
-
-/**
- * Trim excess whitespace off the beginning and end of a string
- *
- * @param {String} str The String to trim
- * @returns {String} The String freed of excess whitespace
- */
-function trim(str) {
-  return str.replace(/^\s*/, '').replace(/\s*$/, '');
-}
-
-/**
- * Determine if we're running in a standard browser environment
- *
- * This allows axios to run in a web worker, and react-native.
- * Both environments support XMLHttpRequest, but not fully standard globals.
- *
- * web workers:
- *  typeof window -> undefined
- *  typeof document -> undefined
- *
- * react-native:
- *  typeof document.createElement -> undefined
- */
-function isStandardBrowserEnv() {
-  return (
-    typeof window !== 'undefined' &&
-    typeof document !== 'undefined' &&
-    typeof document.createElement === 'function'
-  );
-}
-
-/**
- * Iterate over an Array or an Object invoking a function for each item.
- *
- * If `obj` is an Array callback will be called passing
- * the value, index, and complete array for each item.
- *
- * If 'obj' is an Object callback will be called passing
- * the value, key, and complete object for each property.
- *
- * @param {Object|Array} obj The object to iterate
- * @param {Function} fn The callback to invoke for each item
- */
-function forEach(obj, fn) {
-  // Don't bother if no value provided
-  if (obj === null || typeof obj === 'undefined') {
-    return;
-  }
-
-  // Force an array if not already something iterable
-  if (typeof obj !== 'object' && !isArray(obj)) {
-    /*eslint no-param-reassign:0*/
-    obj = [obj];
-  }
-
-  if (isArray(obj)) {
-    // Iterate over array values
-    for (var i = 0, l = obj.length; i < l; i++) {
-      fn.call(null, obj[i], i, obj);
-    }
-  } else {
-    // Iterate over object keys
-    for (var key in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        fn.call(null, obj[key], key, obj);
-      }
-    }
-  }
-}
-
-/**
- * Accepts varargs expecting each argument to be an object, then
- * immutably merges the properties of each object and returns result.
- *
- * When multiple objects contain the same key the later object in
- * the arguments list will take precedence.
- *
- * Example:
- *
- * ```js
- * var result = merge({foo: 123}, {foo: 456});
- * console.log(result.foo); // outputs 456
- * ```
- *
- * @param {Object} obj1 Object to merge
- * @returns {Object} Result of all merge properties
- */
-function merge(/* obj1, obj2, obj3, ... */) {
-  var result = {};
-  function assignValue(val, key) {
-    if (typeof result[key] === 'object' && typeof val === 'object') {
-      result[key] = merge(result[key], val);
-    } else {
-      result[key] = val;
-    }
-  }
-
-  for (var i = 0, l = arguments.length; i < l; i++) {
-    forEach(arguments[i], assignValue);
-  }
-  return result;
-}
-
-/**
- * Extends object a by mutably adding to it the properties of object b.
- *
- * @param {Object} a The object to be extended
- * @param {Object} b The object to copy properties from
- * @param {Object} thisArg The object to bind function to
- * @return {Object} The resulting value of object a
- */
-function extend(a, b, thisArg) {
-  forEach(b, function assignValue(val, key) {
-    if (thisArg && typeof val === 'function') {
-      a[key] = bind(val, thisArg);
-    } else {
-      a[key] = val;
-    }
-  });
-  return a;
-}
-
-module.exports = {
-  isArray: isArray,
-  isArrayBuffer: isArrayBuffer,
-  isFormData: isFormData,
-  isArrayBufferView: isArrayBufferView,
-  isString: isString,
-  isNumber: isNumber,
-  isObject: isObject,
-  isUndefined: isUndefined,
-  isDate: isDate,
-  isFile: isFile,
-  isBlob: isBlob,
-  isFunction: isFunction,
-  isStream: isStream,
-  isURLSearchParams: isURLSearchParams,
-  isStandardBrowserEnv: isStandardBrowserEnv,
-  forEach: forEach,
-  merge: merge,
-  extend: extend,
-  trim: trim
-};
-
-
-/***/ }),
-/* 13 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(process) {
-
-var utils = __webpack_require__(12);
-var normalizeHeaderName = __webpack_require__(34);
-
-var PROTECTION_PREFIX = /^\)\]\}',?\n/;
-var DEFAULT_CONTENT_TYPE = {
-  'Content-Type': 'application/x-www-form-urlencoded'
-};
-
-function setContentTypeIfUnset(headers, value) {
-  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
-    headers['Content-Type'] = value;
-  }
-}
-
-function getDefaultAdapter() {
-  var adapter;
-  if (typeof XMLHttpRequest !== 'undefined') {
-    // For browsers use XHR adapter
-    adapter = __webpack_require__(14);
-  } else if (typeof process !== 'undefined') {
-    // For node use HTTP adapter
-    adapter = __webpack_require__(14);
-  }
-  return adapter;
-}
-
-var defaults = {
-  adapter: getDefaultAdapter(),
-
-  transformRequest: [function transformRequest(data, headers) {
-    normalizeHeaderName(headers, 'Content-Type');
-    if (utils.isFormData(data) ||
-      utils.isArrayBuffer(data) ||
-      utils.isStream(data) ||
-      utils.isFile(data) ||
-      utils.isBlob(data)
-    ) {
-      return data;
-    }
-    if (utils.isArrayBufferView(data)) {
-      return data.buffer;
-    }
-    if (utils.isURLSearchParams(data)) {
-      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
-      return data.toString();
-    }
-    if (utils.isObject(data)) {
-      setContentTypeIfUnset(headers, 'application/json;charset=utf-8');
-      return JSON.stringify(data);
-    }
-    return data;
-  }],
-
-  transformResponse: [function transformResponse(data) {
-    /*eslint no-param-reassign:0*/
-    if (typeof data === 'string') {
-      data = data.replace(PROTECTION_PREFIX, '');
-      try {
-        data = JSON.parse(data);
-      } catch (e) { /* Ignore */ }
-    }
-    return data;
-  }],
-
-  timeout: 0,
-
-  xsrfCookieName: 'XSRF-TOKEN',
-  xsrfHeaderName: 'X-XSRF-TOKEN',
-
-  maxContentLength: -1,
-
-  validateStatus: function validateStatus(status) {
-    return status >= 200 && status < 300;
-  }
-};
-
-defaults.headers = {
-  common: {
-    'Accept': 'application/json, text/plain, */*'
-  }
-};
-
-utils.forEach(['delete', 'get', 'head'], function forEachMehtodNoData(method) {
-  defaults.headers[method] = {};
-});
-
-utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
-  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
-});
-
-module.exports = defaults;
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(40)))
-
-/***/ }),
-/* 14 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var utils = __webpack_require__(12);
-var settle = __webpack_require__(26);
-var buildURL = __webpack_require__(29);
-var parseHeaders = __webpack_require__(35);
-var isURLSameOrigin = __webpack_require__(33);
-var createError = __webpack_require__(17);
-var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(28);
-
-module.exports = function xhrAdapter(config) {
-  return new Promise(function dispatchXhrRequest(resolve, reject) {
-    var requestData = config.data;
-    var requestHeaders = config.headers;
-
-    if (utils.isFormData(requestData)) {
-      delete requestHeaders['Content-Type']; // Let the browser set it
-    }
-
-    var request = new XMLHttpRequest();
-    var loadEvent = 'onreadystatechange';
-    var xDomain = false;
-
-    // For IE 8/9 CORS support
-    // Only supports POST and GET calls and doesn't returns the response headers.
-    // DON'T do this for testing b/c XMLHttpRequest is mocked, not XDomainRequest.
-    if ("development" !== 'test' &&
-        typeof window !== 'undefined' &&
-        window.XDomainRequest && !('withCredentials' in request) &&
-        !isURLSameOrigin(config.url)) {
-      request = new window.XDomainRequest();
-      loadEvent = 'onload';
-      xDomain = true;
-      request.onprogress = function handleProgress() {};
-      request.ontimeout = function handleTimeout() {};
-    }
-
-    // HTTP basic authentication
-    if (config.auth) {
-      var username = config.auth.username || '';
-      var password = config.auth.password || '';
-      requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
-    }
-
-    request.open(config.method.toUpperCase(), buildURL(config.url, config.params, config.paramsSerializer), true);
-
-    // Set the request timeout in MS
-    request.timeout = config.timeout;
-
-    // Listen for ready state
-    request[loadEvent] = function handleLoad() {
-      if (!request || (request.readyState !== 4 && !xDomain)) {
-        return;
-      }
-
-      // The request errored out and we didn't get a response, this will be
-      // handled by onerror instead
-      // With one exception: request that using file: protocol, most browsers
-      // will return status as 0 even though it's a successful request
-      if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
-        return;
-      }
-
-      // Prepare the response
-      var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
-      var responseData = !config.responseType || config.responseType === 'text' ? request.responseText : request.response;
-      var response = {
-        data: responseData,
-        // IE sends 1223 instead of 204 (https://github.com/mzabriskie/axios/issues/201)
-        status: request.status === 1223 ? 204 : request.status,
-        statusText: request.status === 1223 ? 'No Content' : request.statusText,
-        headers: responseHeaders,
-        config: config,
-        request: request
-      };
-
-      settle(resolve, reject, response);
-
-      // Clean up request
-      request = null;
-    };
-
-    // Handle low level network errors
-    request.onerror = function handleError() {
-      // Real errors are hidden from us by the browser
-      // onerror should only fire if it's a network error
-      reject(createError('Network Error', config));
-
-      // Clean up request
-      request = null;
-    };
-
-    // Handle timeout
-    request.ontimeout = function handleTimeout() {
-      reject(createError('timeout of ' + config.timeout + 'ms exceeded', config, 'ECONNABORTED'));
-
-      // Clean up request
-      request = null;
-    };
-
-    // Add xsrf header
-    // This is only done if running in a standard browser environment.
-    // Specifically not if we're in a web worker, or react-native.
-    if (utils.isStandardBrowserEnv()) {
-      var cookies = __webpack_require__(31);
-
-      // Add xsrf header
-      var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
-          cookies.read(config.xsrfCookieName) :
-          undefined;
-
-      if (xsrfValue) {
-        requestHeaders[config.xsrfHeaderName] = xsrfValue;
-      }
-    }
-
-    // Add headers to the request
-    if ('setRequestHeader' in request) {
-      utils.forEach(requestHeaders, function setRequestHeader(val, key) {
-        if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
-          // Remove Content-Type if data is undefined
-          delete requestHeaders[key];
-        } else {
-          // Otherwise add header to the request
-          request.setRequestHeader(key, val);
-        }
-      });
-    }
-
-    // Add withCredentials to request if needed
-    if (config.withCredentials) {
-      request.withCredentials = true;
-    }
-
-    // Add responseType to request if needed
-    if (config.responseType) {
-      try {
-        request.responseType = config.responseType;
-      } catch (e) {
-        if (request.responseType !== 'json') {
-          throw e;
-        }
-      }
-    }
-
-    // Handle progress if needed
-    if (typeof config.onDownloadProgress === 'function') {
-      request.addEventListener('progress', config.onDownloadProgress);
-    }
-
-    // Not all browsers support upload events
-    if (typeof config.onUploadProgress === 'function' && request.upload) {
-      request.upload.addEventListener('progress', config.onUploadProgress);
-    }
-
-    if (config.cancelToken) {
-      // Handle cancellation
-      config.cancelToken.promise.then(function onCanceled(cancel) {
-        if (!request) {
-          return;
-        }
-
-        request.abort();
-        reject(cancel);
-        // Clean up request
-        request = null;
-      });
-    }
-
-    if (requestData === undefined) {
-      requestData = null;
-    }
-
-    // Send the request
-    request.send(requestData);
-  });
-};
-
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * A `Cancel` is an object that is thrown when an operation is canceled.
- *
- * @class
- * @param {string=} message The message.
- */
-function Cancel(message) {
-  this.message = message;
-}
-
-Cancel.prototype.toString = function toString() {
-  return 'Cancel' + (this.message ? ': ' + this.message : '');
-};
-
-Cancel.prototype.__CANCEL__ = true;
-
-module.exports = Cancel;
-
-
-/***/ }),
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = function isCancel(value) {
-  return !!(value && value.__CANCEL__);
-};
-
-
-/***/ }),
-/* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var enhanceError = __webpack_require__(25);
-
-/**
- * Create an Error with the specified message, config, error code, and response.
- *
- * @param {string} message The error message.
- * @param {Object} config The config.
- * @param {string} [code] The error code (for example, 'ECONNABORTED').
- @ @param {Object} [response] The response.
- * @returns {Error} The created error.
- */
-module.exports = function createError(message, config, code, response) {
-  var error = new Error(message);
-  return enhanceError(error, config, code, response);
-};
-
-
-/***/ }),
-/* 18 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = function bind(fn, thisArg) {
-  return function wrap() {
-    var args = new Array(arguments.length);
-    for (var i = 0; i < args.length; i++) {
-      args[i] = arguments[i];
-    }
-    return fn.apply(thisArg, args);
-  };
-};
-
-
-/***/ }),
-/* 19 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(20);
-
-/***/ }),
-/* 20 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var utils = __webpack_require__(12);
-var bind = __webpack_require__(18);
-var Axios = __webpack_require__(22);
-var defaults = __webpack_require__(13);
-
-/**
- * Create an instance of Axios
- *
- * @param {Object} defaultConfig The default config for the instance
- * @return {Axios} A new instance of Axios
- */
-function createInstance(defaultConfig) {
-  var context = new Axios(defaultConfig);
-  var instance = bind(Axios.prototype.request, context);
-
-  // Copy axios.prototype to instance
-  utils.extend(instance, Axios.prototype, context);
-
-  // Copy context to instance
-  utils.extend(instance, context);
-
-  return instance;
-}
-
-// Create the default instance to be exported
-var axios = createInstance(defaults);
-
-// Expose Axios class to allow class inheritance
-axios.Axios = Axios;
-
-// Factory for creating new instances
-axios.create = function create(instanceConfig) {
-  return createInstance(utils.merge(defaults, instanceConfig));
-};
-
-// Expose Cancel & CancelToken
-axios.Cancel = __webpack_require__(15);
-axios.CancelToken = __webpack_require__(21);
-axios.isCancel = __webpack_require__(16);
-
-// Expose all/spread
-axios.all = function all(promises) {
-  return Promise.all(promises);
-};
-axios.spread = __webpack_require__(36);
-
-module.exports = axios;
-
-// Allow use of default import syntax in TypeScript
-module.exports.default = axios;
-
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var Cancel = __webpack_require__(15);
-
-/**
- * A `CancelToken` is an object that can be used to request cancellation of an operation.
- *
- * @class
- * @param {Function} executor The executor function.
- */
-function CancelToken(executor) {
-  if (typeof executor !== 'function') {
-    throw new TypeError('executor must be a function.');
-  }
-
-  var resolvePromise;
-  this.promise = new Promise(function promiseExecutor(resolve) {
-    resolvePromise = resolve;
-  });
-
-  var token = this;
-  executor(function cancel(message) {
-    if (token.reason) {
-      // Cancellation has already been requested
-      return;
-    }
-
-    token.reason = new Cancel(message);
-    resolvePromise(token.reason);
-  });
-}
-
-/**
- * Throws a `Cancel` if cancellation has been requested.
- */
-CancelToken.prototype.throwIfRequested = function throwIfRequested() {
-  if (this.reason) {
-    throw this.reason;
-  }
-};
-
-/**
- * Returns an object that contains a new `CancelToken` and a function that, when called,
- * cancels the `CancelToken`.
- */
-CancelToken.source = function source() {
-  var cancel;
-  var token = new CancelToken(function executor(c) {
-    cancel = c;
-  });
-  return {
-    token: token,
-    cancel: cancel
-  };
-};
-
-module.exports = CancelToken;
-
-
-/***/ }),
-/* 22 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var defaults = __webpack_require__(13);
-var utils = __webpack_require__(12);
-var InterceptorManager = __webpack_require__(23);
-var dispatchRequest = __webpack_require__(24);
-var isAbsoluteURL = __webpack_require__(32);
-var combineURLs = __webpack_require__(30);
-
-/**
- * Create a new instance of Axios
- *
- * @param {Object} instanceConfig The default config for the instance
- */
-function Axios(instanceConfig) {
-  this.defaults = instanceConfig;
-  this.interceptors = {
-    request: new InterceptorManager(),
-    response: new InterceptorManager()
-  };
-}
-
-/**
- * Dispatch a request
- *
- * @param {Object} config The config specific for this request (merged with this.defaults)
- */
-Axios.prototype.request = function request(config) {
-  /*eslint no-param-reassign:0*/
-  // Allow for axios('example/url'[, config]) a la fetch API
-  if (typeof config === 'string') {
-    config = utils.merge({
-      url: arguments[0]
-    }, arguments[1]);
-  }
-
-  config = utils.merge(defaults, this.defaults, { method: 'get' }, config);
-
-  // Support baseURL config
-  if (config.baseURL && !isAbsoluteURL(config.url)) {
-    config.url = combineURLs(config.baseURL, config.url);
-  }
-
-  // Hook up interceptors middleware
-  var chain = [dispatchRequest, undefined];
-  var promise = Promise.resolve(config);
-
-  this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
-    chain.unshift(interceptor.fulfilled, interceptor.rejected);
-  });
-
-  this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
-    chain.push(interceptor.fulfilled, interceptor.rejected);
-  });
-
-  while (chain.length) {
-    promise = promise.then(chain.shift(), chain.shift());
-  }
-
-  return promise;
-};
-
-// Provide aliases for supported request methods
-utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
-  /*eslint func-names:0*/
-  Axios.prototype[method] = function(url, config) {
-    return this.request(utils.merge(config || {}, {
-      method: method,
-      url: url
-    }));
-  };
-});
-
-utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
-  /*eslint func-names:0*/
-  Axios.prototype[method] = function(url, data, config) {
-    return this.request(utils.merge(config || {}, {
-      method: method,
-      url: url,
-      data: data
-    }));
-  };
-});
-
-module.exports = Axios;
-
-
-/***/ }),
-/* 23 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var utils = __webpack_require__(12);
-
-function InterceptorManager() {
-  this.handlers = [];
-}
-
-/**
- * Add a new interceptor to the stack
- *
- * @param {Function} fulfilled The function to handle `then` for a `Promise`
- * @param {Function} rejected The function to handle `reject` for a `Promise`
- *
- * @return {Number} An ID used to remove interceptor later
- */
-InterceptorManager.prototype.use = function use(fulfilled, rejected) {
-  this.handlers.push({
-    fulfilled: fulfilled,
-    rejected: rejected
-  });
-  return this.handlers.length - 1;
-};
-
-/**
- * Remove an interceptor from the stack
- *
- * @param {Number} id The ID that was returned by `use`
- */
-InterceptorManager.prototype.eject = function eject(id) {
-  if (this.handlers[id]) {
-    this.handlers[id] = null;
-  }
-};
-
-/**
- * Iterate over all the registered interceptors
- *
- * This method is particularly useful for skipping over any
- * interceptors that may have become `null` calling `eject`.
- *
- * @param {Function} fn The function to call for each interceptor
- */
-InterceptorManager.prototype.forEach = function forEach(fn) {
-  utils.forEach(this.handlers, function forEachHandler(h) {
-    if (h !== null) {
-      fn(h);
-    }
-  });
-};
-
-module.exports = InterceptorManager;
-
-
-/***/ }),
-/* 24 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var utils = __webpack_require__(12);
-var transformData = __webpack_require__(27);
-var isCancel = __webpack_require__(16);
-var defaults = __webpack_require__(13);
-
-/**
- * Throws a `Cancel` if cancellation has been requested.
- */
-function throwIfCancellationRequested(config) {
-  if (config.cancelToken) {
-    config.cancelToken.throwIfRequested();
-  }
-}
-
-/**
- * Dispatch a request to the server using the configured adapter.
- *
- * @param {object} config The config that is to be used for the request
- * @returns {Promise} The Promise to be fulfilled
- */
-module.exports = function dispatchRequest(config) {
-  throwIfCancellationRequested(config);
-
-  // Ensure headers exist
-  config.headers = config.headers || {};
-
-  // Transform request data
-  config.data = transformData(
-    config.data,
-    config.headers,
-    config.transformRequest
-  );
-
-  // Flatten headers
-  config.headers = utils.merge(
-    config.headers.common || {},
-    config.headers[config.method] || {},
-    config.headers || {}
-  );
-
-  utils.forEach(
-    ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
-    function cleanHeaderConfig(method) {
-      delete config.headers[method];
-    }
-  );
-
-  var adapter = config.adapter || defaults.adapter;
-
-  return adapter(config).then(function onAdapterResolution(response) {
-    throwIfCancellationRequested(config);
-
-    // Transform response data
-    response.data = transformData(
-      response.data,
-      response.headers,
-      config.transformResponse
-    );
-
-    return response;
-  }, function onAdapterRejection(reason) {
-    if (!isCancel(reason)) {
-      throwIfCancellationRequested(config);
-
-      // Transform response data
-      if (reason && reason.response) {
-        reason.response.data = transformData(
-          reason.response.data,
-          reason.response.headers,
-          config.transformResponse
-        );
-      }
-    }
-
-    return Promise.reject(reason);
-  });
-};
-
-
-/***/ }),
-/* 25 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * Update an Error with the specified config, error code, and response.
- *
- * @param {Error} error The error to update.
- * @param {Object} config The config.
- * @param {string} [code] The error code (for example, 'ECONNABORTED').
- @ @param {Object} [response] The response.
- * @returns {Error} The error.
- */
-module.exports = function enhanceError(error, config, code, response) {
-  error.config = config;
-  if (code) {
-    error.code = code;
-  }
-  error.response = response;
-  return error;
-};
-
-
-/***/ }),
-/* 26 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var createError = __webpack_require__(17);
-
-/**
- * Resolve or reject a Promise based on response status.
- *
- * @param {Function} resolve A function that resolves the promise.
- * @param {Function} reject A function that rejects the promise.
- * @param {object} response The response.
- */
-module.exports = function settle(resolve, reject, response) {
-  var validateStatus = response.config.validateStatus;
-  // Note: status is not exposed by XDomainRequest
-  if (!response.status || !validateStatus || validateStatus(response.status)) {
-    resolve(response);
-  } else {
-    reject(createError(
-      'Request failed with status code ' + response.status,
-      response.config,
-      null,
-      response
-    ));
-  }
-};
-
-
-/***/ }),
-/* 27 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var utils = __webpack_require__(12);
-
-/**
- * Transform the data for a request or a response
- *
- * @param {Object|String} data The data to be transformed
- * @param {Array} headers The headers for the request or response
- * @param {Array|Function} fns A single function or Array of functions
- * @returns {*} The resulting transformed data
- */
-module.exports = function transformData(data, headers, fns) {
-  /*eslint no-param-reassign:0*/
-  utils.forEach(fns, function transform(fn) {
-    data = fn(data, headers);
-  });
-
-  return data;
-};
-
-
-/***/ }),
-/* 28 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-// btoa polyfill for IE<10 courtesy https://github.com/davidchambers/Base64.js
-
-var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-
-function E() {
-  this.message = 'String contains an invalid character';
-}
-E.prototype = new Error;
-E.prototype.code = 5;
-E.prototype.name = 'InvalidCharacterError';
-
-function btoa(input) {
-  var str = String(input);
-  var output = '';
-  for (
-    // initialize result and counter
-    var block, charCode, idx = 0, map = chars;
-    // if the next str index does not exist:
-    //   change the mapping table to "="
-    //   check if d has no fractional digits
-    str.charAt(idx | 0) || (map = '=', idx % 1);
-    // "8 - idx % 1 * 8" generates the sequence 2, 4, 6, 8
-    output += map.charAt(63 & block >> 8 - idx % 1 * 8)
-  ) {
-    charCode = str.charCodeAt(idx += 3 / 4);
-    if (charCode > 0xFF) {
-      throw new E();
-    }
-    block = block << 8 | charCode;
-  }
-  return output;
-}
-
-module.exports = btoa;
-
-
-/***/ }),
-/* 29 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var utils = __webpack_require__(12);
-
-function encode(val) {
-  return encodeURIComponent(val).
-    replace(/%40/gi, '@').
-    replace(/%3A/gi, ':').
-    replace(/%24/g, '$').
-    replace(/%2C/gi, ',').
-    replace(/%20/g, '+').
-    replace(/%5B/gi, '[').
-    replace(/%5D/gi, ']');
-}
-
-/**
- * Build a URL by appending params to the end
- *
- * @param {string} url The base of the url (e.g., http://www.google.com)
- * @param {object} [params] The params to be appended
- * @returns {string} The formatted url
- */
-module.exports = function buildURL(url, params, paramsSerializer) {
-  /*eslint no-param-reassign:0*/
-  if (!params) {
-    return url;
-  }
-
-  var serializedParams;
-  if (paramsSerializer) {
-    serializedParams = paramsSerializer(params);
-  } else if (utils.isURLSearchParams(params)) {
-    serializedParams = params.toString();
-  } else {
-    var parts = [];
-
-    utils.forEach(params, function serialize(val, key) {
-      if (val === null || typeof val === 'undefined') {
-        return;
-      }
-
-      if (utils.isArray(val)) {
-        key = key + '[]';
-      }
-
-      if (!utils.isArray(val)) {
-        val = [val];
-      }
-
-      utils.forEach(val, function parseValue(v) {
-        if (utils.isDate(v)) {
-          v = v.toISOString();
-        } else if (utils.isObject(v)) {
-          v = JSON.stringify(v);
-        }
-        parts.push(encode(key) + '=' + encode(v));
-      });
-    });
-
-    serializedParams = parts.join('&');
-  }
-
-  if (serializedParams) {
-    url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
-  }
-
-  return url;
-};
-
-
-/***/ }),
-/* 30 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * Creates a new URL by combining the specified URLs
- *
- * @param {string} baseURL The base URL
- * @param {string} relativeURL The relative URL
- * @returns {string} The combined URL
- */
-module.exports = function combineURLs(baseURL, relativeURL) {
-  return baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '');
-};
-
-
-/***/ }),
-/* 31 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var utils = __webpack_require__(12);
-
-module.exports = (
-  utils.isStandardBrowserEnv() ?
-
-  // Standard browser envs support document.cookie
-  (function standardBrowserEnv() {
-    return {
-      write: function write(name, value, expires, path, domain, secure) {
-        var cookie = [];
-        cookie.push(name + '=' + encodeURIComponent(value));
-
-        if (utils.isNumber(expires)) {
-          cookie.push('expires=' + new Date(expires).toGMTString());
-        }
-
-        if (utils.isString(path)) {
-          cookie.push('path=' + path);
-        }
-
-        if (utils.isString(domain)) {
-          cookie.push('domain=' + domain);
-        }
-
-        if (secure === true) {
-          cookie.push('secure');
-        }
-
-        document.cookie = cookie.join('; ');
-      },
-
-      read: function read(name) {
-        var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
-        return (match ? decodeURIComponent(match[3]) : null);
-      },
-
-      remove: function remove(name) {
-        this.write(name, '', Date.now() - 86400000);
-      }
-    };
-  })() :
-
-  // Non standard browser env (web workers, react-native) lack needed support.
-  (function nonStandardBrowserEnv() {
-    return {
-      write: function write() {},
-      read: function read() { return null; },
-      remove: function remove() {}
-    };
-  })()
-);
-
-
-/***/ }),
 /* 32 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * Determines whether the specified URL is absolute
- *
- * @param {string} url The URL to test
- * @returns {boolean} True if the specified URL is absolute, otherwise false
- */
-module.exports = function isAbsoluteURL(url) {
-  // A URL is considered absolute if it begins with "<scheme>://" or "//" (protocol-relative URL).
-  // RFC 3986 defines scheme name as a sequence of characters beginning with a letter and followed
-  // by any combination of letters, digits, plus, period, or hyphen.
-  return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
-};
-
-
-/***/ }),
-/* 33 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var utils = __webpack_require__(12);
-
-module.exports = (
-  utils.isStandardBrowserEnv() ?
-
-  // Standard browser envs have full support of the APIs needed to test
-  // whether the request URL is of the same origin as current location.
-  (function standardBrowserEnv() {
-    var msie = /(msie|trident)/i.test(navigator.userAgent);
-    var urlParsingNode = document.createElement('a');
-    var originURL;
-
-    /**
-    * Parse a URL to discover it's components
-    *
-    * @param {String} url The URL to be parsed
-    * @returns {Object}
-    */
-    function resolveURL(url) {
-      var href = url;
-
-      if (msie) {
-        // IE needs attribute set twice to normalize properties
-        urlParsingNode.setAttribute('href', href);
-        href = urlParsingNode.href;
-      }
-
-      urlParsingNode.setAttribute('href', href);
-
-      // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
-      return {
-        href: urlParsingNode.href,
-        protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
-        host: urlParsingNode.host,
-        search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
-        hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
-        hostname: urlParsingNode.hostname,
-        port: urlParsingNode.port,
-        pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
-                  urlParsingNode.pathname :
-                  '/' + urlParsingNode.pathname
-      };
-    }
-
-    originURL = resolveURL(window.location.href);
-
-    /**
-    * Determine if a URL shares the same origin as the current location
-    *
-    * @param {String} requestURL The URL to test
-    * @returns {boolean} True if URL shares the same origin, otherwise false
-    */
-    return function isURLSameOrigin(requestURL) {
-      var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
-      return (parsed.protocol === originURL.protocol &&
-            parsed.host === originURL.host);
-    };
-  })() :
-
-  // Non standard browser envs (web workers, react-native) lack needed support.
-  (function nonStandardBrowserEnv() {
-    return function isURLSameOrigin() {
-      return true;
-    };
-  })()
-);
-
-
-/***/ }),
-/* 34 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var utils = __webpack_require__(12);
-
-module.exports = function normalizeHeaderName(headers, normalizedName) {
-  utils.forEach(headers, function processHeader(value, name) {
-    if (name !== normalizedName && name.toUpperCase() === normalizedName.toUpperCase()) {
-      headers[normalizedName] = value;
-      delete headers[name];
-    }
-  });
-};
-
-
-/***/ }),
-/* 35 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var utils = __webpack_require__(12);
-
-/**
- * Parse headers into an object
- *
- * ```
- * Date: Wed, 27 Aug 2014 08:58:49 GMT
- * Content-Type: application/json
- * Connection: keep-alive
- * Transfer-Encoding: chunked
- * ```
- *
- * @param {String} headers Headers needing to be parsed
- * @returns {Object} Headers parsed into an object
- */
-module.exports = function parseHeaders(headers) {
-  var parsed = {};
-  var key;
-  var val;
-  var i;
-
-  if (!headers) { return parsed; }
-
-  utils.forEach(headers.split('\n'), function parser(line) {
-    i = line.indexOf(':');
-    key = utils.trim(line.substr(0, i)).toLowerCase();
-    val = utils.trim(line.substr(i + 1));
-
-    if (key) {
-      parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
-    }
-  });
-
-  return parsed;
-};
-
-
-/***/ }),
-/* 36 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * Syntactic sugar for invoking a function and expanding an array for arguments.
- *
- * Common use case would be to use `Function.prototype.apply`.
- *
- *  ```js
- *  function f(x, y, z) {}
- *  var args = [1, 2, 3];
- *  f.apply(null, args);
- *  ```
- *
- * With `spread` this example can be re-written.
- *
- *  ```js
- *  spread(function(x, y, z) {})([1, 2, 3]);
- *  ```
- *
- * @param {Function} callback
- * @returns {Function}
- */
-module.exports = function spread(callback) {
-  return function wrap(arr) {
-    return callback.apply(null, arr);
-  };
-};
-
-
-/***/ }),
-/* 37 */
-/***/ (function(module, exports, __webpack_require__) {
-
-
-window._ = __webpack_require__(39);
-
-/**
- * We'll load jQuery and the Bootstrap jQuery plugin which provides support
- * for JavaScript based Bootstrap features such as modals and tabs. This
- * code may be modified to fit the specific needs of your application.
- */
-
-try {
-  window.$ = window.jQuery = __webpack_require__(8);
-
-  __webpack_require__(38);
-} catch (e) {}
-
-/**
- * We'll load the axios HTTP library which allows us to easily issue requests
- * to our Laravel back-end. This library automatically handles sending the
- * CSRF token as a header based on the value of the "XSRF" token cookie.
- */
-
-window.axios = __webpack_require__(19);
-
-window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-
-/**
- * Next we will register the CSRF Token as a common header with Axios so that
- * all outgoing HTTP requests automatically have it attached. This is just
- * a simple convenience so we don't have to attach every token manually.
- */
-
-var token = document.head.querySelector('meta[name="csrf-token"]');
-
-if (token) {
-  window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
-} else {
-  console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
-}
-
-/**
- * Echo exposes an expressive API for subscribing to channels and listening
- * for events that are broadcast by Laravel. Echo and event broadcasting
- * allows your team to easily build robust real-time web applications.
- */
-
-// import Echo from 'laravel-echo'
-
-// window.Pusher = require('pusher-js');
-
-// window.Echo = new Echo({
-//     broadcaster: 'pusher',
-//     key: 'your-pusher-key'
-// });
-
-/***/ }),
-/* 38 */
 /***/ (function(module, exports) {
 
 /*!
@@ -15970,7 +16289,7 @@ if (typeof jQuery === 'undefined') {
 
 
 /***/ }),
-/* 39 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -33059,10 +33378,10 @@ if (typeof jQuery === 'undefined') {
   }
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(41), __webpack_require__(42)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(35), __webpack_require__(36)(module)))
 
 /***/ }),
-/* 40 */
+/* 34 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -33252,7 +33571,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 41 */
+/* 35 */
 /***/ (function(module, exports) {
 
 var g;
@@ -33279,7 +33598,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 42 */
+/* 36 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -33307,338 +33626,12 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 43 */,
-/* 44 */
-/***/ (function(module, exports) {
+/* 37 */
+/***/ (function(module, exports, __webpack_require__) {
 
-/**
- * Resize function without multiple trigger
- * 
- * Usage:
- * $(window).smartresize(function(){  
- *     // code here
- * });
- */
-(function ($, sr) {
-    // debouncing function from John Hann
-    // http://unscriptable.com/index.php/2009/03/20/debouncing-javascript-methods/
-    var debounce = function debounce(func, threshold, execAsap) {
-        var timeout;
+__webpack_require__(8);
+module.exports = __webpack_require__(9);
 
-        return function debounced() {
-            var obj = this,
-                args = arguments;
-            function delayed() {
-                if (!execAsap) func.apply(obj, args);
-                timeout = null;
-            }
-
-            if (timeout) clearTimeout(timeout);else if (execAsap) func.apply(obj, args);
-
-            timeout = setTimeout(delayed, threshold || 100);
-        };
-    };
-
-    // smartresize 
-    jQuery.fn[sr] = function (fn) {
-        return fn ? this.bind('resize', debounce(fn)) : this.trigger(sr);
-    };
-})(jQuery, 'smartresize');
-/**
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-var CURRENT_URL = window.location.href.split('#')[0].split('?')[0],
-    $BODY = $('body'),
-    $MENU_TOGGLE = $('#menu_toggle'),
-    $SIDEBAR_MENU = $('#sidebar-menu'),
-    $SIDEBAR_FOOTER = $('.sidebar-footer'),
-    $LEFT_COL = $('.left_col'),
-    $RIGHT_COL = $('.right_col'),
-    $NAV_MENU = $('.nav_menu'),
-    $FOOTER = $('footer');
-
-// Sidebar
-function init_sidebar() {
-    // TODO: This is some kind of easy fix, maybe we can improve this
-    var setContentHeight = function setContentHeight() {
-        // reset height
-        $RIGHT_COL.css('min-height', $(window).height());
-
-        var bodyHeight = $BODY.outerHeight(),
-            footerHeight = $BODY.hasClass('footer_fixed') ? -10 : $FOOTER.height(),
-            leftColHeight = $LEFT_COL.eq(1).height() + $SIDEBAR_FOOTER.height(),
-            contentHeight = bodyHeight < leftColHeight ? leftColHeight : bodyHeight;
-
-        // normalize content
-        contentHeight -= $NAV_MENU.height() + footerHeight;
-
-        $RIGHT_COL.css('min-height', contentHeight);
-    };
-
-    $SIDEBAR_MENU.find('a').on('click', function (ev) {
-        console.log('clicked - sidebar_menu');
-        var $li = $(this).parent();
-
-        if ($li.is('.active')) {
-            $li.removeClass('active active-sm');
-            $('ul:first', $li).slideUp(function () {
-                setContentHeight();
-            });
-        } else {
-            // prevent closing menu if we are on child menu
-            if (!$li.parent().is('.child_menu')) {
-                $SIDEBAR_MENU.find('li').removeClass('active active-sm');
-                $SIDEBAR_MENU.find('li ul').slideUp();
-            } else {
-                if ($BODY.is(".nav-sm")) {
-                    $SIDEBAR_MENU.find("li").removeClass("active active-sm");
-                    $SIDEBAR_MENU.find("li ul").slideUp();
-                }
-            }
-            $li.addClass('active');
-
-            $('ul:first', $li).slideDown(function () {
-                setContentHeight();
-            });
-        }
-    });
-
-    // toggle small or large menu 
-    $MENU_TOGGLE.on('click', function () {
-        console.log('clicked - menu toggle');
-
-        if ($BODY.hasClass('nav-md')) {
-            $SIDEBAR_MENU.find('li.active ul').hide();
-            $SIDEBAR_MENU.find('li.active').addClass('active-sm').removeClass('active');
-        } else {
-            $SIDEBAR_MENU.find('li.active-sm ul').show();
-            $SIDEBAR_MENU.find('li.active-sm').addClass('active').removeClass('active-sm');
-        }
-
-        $BODY.toggleClass('nav-md nav-sm');
-
-        setContentHeight();
-
-        $('.dataTable').each(function () {
-            $(this).dataTable().fnDraw();
-        });
-    });
-
-    // check active menu
-    $SIDEBAR_MENU.find('a[href="' + CURRENT_URL + '"]').parent('li').addClass('current-page');
-
-    $SIDEBAR_MENU.find('a').filter(function () {
-        return this.href == CURRENT_URL;
-    }).parent('li').addClass('current-page').parents('ul').slideDown(function () {
-        setContentHeight();
-    }).parent().addClass('active');
-
-    // recompute content when resizing
-    $(window).smartresize(function () {
-        setContentHeight();
-    });
-
-    setContentHeight();
-
-    // fixed sidebar
-    if ($.fn.mCustomScrollbar) {
-        $('.menu_fixed').mCustomScrollbar({
-            autoHideScrollbar: true,
-            theme: 'minimal',
-            mouseWheel: { preventDefault: true }
-        });
-    }
-};
-// /Sidebar
-
-var randNum = function randNum() {
-    return Math.floor(Math.random() * (1 + 40 - 20)) + 20;
-};
-
-// Panel toolbox
-$(document).ready(function () {
-    $('.collapse-link').on('click', function () {
-        var $BOX_PANEL = $(this).closest('.x_panel'),
-            $ICON = $(this).find('i'),
-            $BOX_CONTENT = $BOX_PANEL.find('.x_content');
-
-        // fix for some div with hardcoded fix class
-        if ($BOX_PANEL.attr('style')) {
-            $BOX_CONTENT.slideToggle(200, function () {
-                $BOX_PANEL.removeAttr('style');
-            });
-        } else {
-            $BOX_CONTENT.slideToggle(200);
-            $BOX_PANEL.css('height', 'auto');
-        }
-
-        $ICON.toggleClass('fa-chevron-up fa-chevron-down');
-    });
-
-    $('.close-link').click(function () {
-        var $BOX_PANEL = $(this).closest('.x_panel');
-
-        $BOX_PANEL.remove();
-    });
-});
-// /Panel toolbox
-
-// Tooltip
-$(document).ready(function () {
-    $('[data-toggle="tooltip"]').tooltip({
-        container: 'body'
-    });
-});
-// /Tooltip
-
-// Progressbar
-if ($(".progress .progress-bar")[0]) {
-    $('.progress .progress-bar').progressbar();
-}
-// /Progressbar
-
-// Switchery
-$(document).ready(function () {
-    if ($(".js-switch")[0]) {
-        var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
-        elems.forEach(function (html) {
-            var switchery = new Switchery(html, {
-                color: '#26B99A'
-            });
-        });
-    }
-});
-// /Switchery
-
-
-// iCheck
-$(document).ready(function () {
-    if ($("input.flat")[0]) {
-        $(document).ready(function () {
-            $('input.flat').iCheck({
-                checkboxClass: 'icheckbox_flat-green',
-                radioClass: 'iradio_flat-green'
-            });
-        });
-    }
-});
-// /iCheck
-
-// Table
-$('table input').on('ifChecked', function () {
-    checkState = '';
-    $(this).parent().parent().parent().addClass('selected');
-    countChecked();
-});
-$('table input').on('ifUnchecked', function () {
-    checkState = '';
-    $(this).parent().parent().parent().removeClass('selected');
-    countChecked();
-});
-
-var checkState = '';
-
-$('.bulk_action input').on('ifChecked', function () {
-    checkState = '';
-    $(this).parent().parent().parent().addClass('selected');
-    countChecked();
-});
-$('.bulk_action input').on('ifUnchecked', function () {
-    checkState = '';
-    $(this).parent().parent().parent().removeClass('selected');
-    countChecked();
-});
-$('.bulk_action input#check-all').on('ifChecked', function () {
-    checkState = 'all';
-    countChecked();
-});
-$('.bulk_action input#check-all').on('ifUnchecked', function () {
-    checkState = 'none';
-    countChecked();
-});
-
-function countChecked() {
-    if (checkState === 'all') {
-        $(".bulk_action input[name='table_records']").iCheck('check');
-    }
-    if (checkState === 'none') {
-        $(".bulk_action input[name='table_records']").iCheck('uncheck');
-    }
-
-    var checkCount = $(".bulk_action input[name='table_records']:checked").length;
-
-    if (checkCount) {
-        $('.column-title').hide();
-        $('.bulk-actions').show();
-        $('.action-cnt').html(checkCount + ' Records Selected');
-    } else {
-        $('.column-title').show();
-        $('.bulk-actions').hide();
-    }
-}
-
-// Accordion
-$(document).ready(function () {
-    $(".expand").on("click", function () {
-        $(this).next().slideToggle(200);
-        $expand = $(this).find(">:first-child");
-
-        if ($expand.text() == "+") {
-            $expand.text("-");
-        } else {
-            $expand.text("+");
-        }
-    });
-});
-
-// NProgress
-if (typeof NProgress != 'undefined') {
-    $(document).ready(function () {
-        NProgress.start();
-    });
-
-    $(window).load(function () {
-        NProgress.done();
-    });
-}
-
-//hover and retain popover when on popover content
-var originalLeave = $.fn.popover.Constructor.prototype.leave;
-$.fn.popover.Constructor.prototype.leave = function (obj) {
-    var self = obj instanceof this.constructor ? obj : $(obj.currentTarget)[this.type](this.getDelegateOptions()).data('bs.' + this.type);
-    var container, timeout;
-
-    originalLeave.call(this, obj);
-
-    if (obj.currentTarget) {
-        container = $(obj.currentTarget).siblings('.popover');
-        timeout = self.timeout;
-        container.one('mouseenter', function () {
-            //We entered the actual popover – call off the dogs
-            clearTimeout(timeout);
-            //Let's monitor popover content instead
-            container.one('mouseleave', function () {
-                $.fn.popover.Constructor.prototype.leave.call(self, self);
-            });
-        });
-    }
-};
-
-$('body').popover({
-    selector: '[data-popover]',
-    trigger: 'click hover',
-    delay: {
-        show: 50,
-        hide: 400
-    }
-});
-
-$(document).ready(function () {
-    init_sidebar();
-});
 
 /***/ })
 /******/ ]);
