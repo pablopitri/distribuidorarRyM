@@ -11,7 +11,7 @@ class UsersController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('admin')->except('show');
+        $this->middleware('admin')->except(['show', 'edit']);
     }
     /**
      * Display a listing of the resource.
@@ -98,8 +98,11 @@ class UsersController extends Controller
      */
     public function edit($id)
     {
-        $user = User::find($id);
-        return view('users.edit', ['user' => $user]);
+        if(Auth::user()->id == $id || Auth::user()->isAdmin())
+        {
+            $user = User::find($id);
+            return view('users.edit', ['user' => $user]);
+        }
     }
 
     /**

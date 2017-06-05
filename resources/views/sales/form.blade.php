@@ -14,12 +14,13 @@
 		</div>
 	</div>
 	<input type="hidden" value="{{ $n }}" id="products" name="products">
+	<input type="hidden" value="{{ $num }}" id="sale" name="products">
 	@if(!$option)
 		<div class="float-sale hidden" id="button-sale">
 			<table>
 				<tr>
 					<td>
-						<button type="submit" class="btn btn-success btn-lg">
+						<button type="submit" class="btn btn-success btn-lg" id="print">
 							<span class="glyphicon glyphicon-usd" aria-hidden="true"></span>
 							PAGAR
 						</button>

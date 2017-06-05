@@ -126,4 +126,9 @@ class SalesController extends Controller
                         ->get();
         return response()->json($sales);
     }
+
+    public function boleta($cod){
+        $sale = Sale::find($cod);
+        return view('sales.boleta', ['sale' => $sale]);
+    }
 }

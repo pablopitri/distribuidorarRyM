@@ -25,4 +25,6 @@ Route::get('/users/search/{nombre}/{email}/{priv}', 'UsersController@search');
 
 Route::get('/sales/search/{cod}/{fecha}/{vendedor}', 'SalesController@search');
 
+Route::get('/sales/boleta/{cod}', 'SalesController@boleta');
+
 Auth::routes();

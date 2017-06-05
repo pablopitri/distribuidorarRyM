@@ -11201,7 +11201,7 @@ function add_product(product, cant, n) {
 		if (i == 0) nuevaFila += '<td class="center"><input type="text" value="' + product.id + '" name="id-' + n + '" class="hidden"/>' + data[i] + '</td>';else if (i == 3) nuevaFila += '<td class="center"><input type="text" value="' + data[i] + '" name="cant-' + n + '" class="hidden"/>' + formatearNumero(data[i]) + '</td>';else if (i === 4) {
 			setTotal(data[i]);
 			nuevaFila += '<td class="center"><input type="text" value="' + data[i] + '" name="total-' + n + '" id="total-' + n + '" class="hidden"/>' + formatearNumero(data[i]) + '</td>';
-		} else if (i == 5) nuevaFila += '<td class="center"><button class="btn btn-danger borrar" id="' + n + '"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button></td>';else nuevaFila += '<td class="center">' + data[i] + '</td>';
+		} else if (i == 5) nuevaFila += '<td class="center"><button class="btn btn-danger borrar" id="' + n + '"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button></td>';else if (i == 2) nuevaFila += '<td class="center"><input type="text" value="' + data[i] + '" name="total-' + n + '" id="total-' + n + '" class="hidden"/>' + formatearNumero(data[i]) + '</td>';else nuevaFila += '<td class="center">' + data[i] + '</td>';
 	}
 	nuevaFila += "</tr>";
 	$("#productos").append(nuevaFila);
@@ -11251,6 +11251,16 @@ function formatearNumero(nStr) {
 	}
 	return x1 + x2;
 }
+
+$("#print").click(function (event) {
+	alert("jasjsajsa");
+	event.preventDefault();
+	$(this).submit();
+	var venta = $('#sale').val();
+	window.open('/distribuidoraRyM/public/sale/boleta/' + venta);
+	window.print();
+	window.close();
+});
 
 /***/ }),
 /* 9 */

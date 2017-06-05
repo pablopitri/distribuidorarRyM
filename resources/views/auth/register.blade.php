@@ -82,7 +82,7 @@
               <div class="form-group margin-top">
                   <div class="col-xs-12 center margin-top">
                       <a class="btn btn-link" href="{{ route('login') }}">
-                          Login
+                          Login 
                       </a>
                   </div>
               </div>

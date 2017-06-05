@@ -357,6 +357,8 @@ function add_product(product, cant, n){
       }
       else if(i == 5)
       	nuevaFila+=`<td class="center"><button class="btn btn-danger borrar" id="${n}"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button></td>`;
+      else if(i == 2)
+      	nuevaFila+=`<td class="center"><input type="text" value="${data[i]}" name="total-${n}" id="total-${n}" class="hidden"/>${formatearNumero(data[i])}</td>`;
       else
       	nuevaFila+=`<td class="center">${data[i]}</td>`;
   }
@@ -409,3 +411,13 @@ function formatearNumero(nStr) {
     }
     return x1 + x2;
 }
+
+$("#print").click(function(event){
+	alert("jasjsajsa");
+	event.preventDefault();
+	$(this).submit();
+	let venta = $('#sale').val();
+	window.open(`/distribuidoraRyM/public/sale/boleta/${venta}`);
+	window.print();
+	window.close();
+})

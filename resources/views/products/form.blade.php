@@ -7,7 +7,7 @@
 					<div class="form-group">
 						<label class="control-label col-xs-3" for="codigo">CODIGO</label>
 						<div class="col-xs-9">
-							{{ Form::text('codigo', $product->code, ['class' => 'form-control', $option => 'true', 'required' => 'true', 'id' => 'codigo']) }}
+							{{ Form::text('codigo', $product->code, ['class' => 'form-control', $option => 'true', 'required' => 'true', 'id' => 'codigo', 'autofocus' => "true"]) }}
 						</div>
 					</div>
 					<br>
