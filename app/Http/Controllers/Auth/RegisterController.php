@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 
+use Illuminate\Support\Facades\Input;
+
 class RegisterController extends Controller
 {
     /*
@@ -34,9 +36,10 @@ class RegisterController extends Controller
      *
      * @return void
      */
-    public function __construct()
+
+    public function __contruct()
     {
-        $this->middleware('guest');
+        $this->middleware('first.user');
     }
 
     /**
@@ -49,7 +52,10 @@ class RegisterController extends Controller
     {
         return Validator::make($data, [
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'last_name' => 'required|string|max:255',
+            'username' => 'required|string|max:255',
+            'rol' => 'string|max:25',
+            'email' => 'required|string|email|max:100|unique:users',
             'password' => 'required|string|min:6|confirmed',
         ]);
     }
@@ -62,10 +68,23 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+        $rol = isset($data['rol']) ? $data['rol'] : 'cajero';
+        $image = '';
+
+        $hasFile = Input::hasFile('image') && Input::file('image')->isValid();
+
+        if ($hasFile)
+            $image = uniqid().'.'.Input::file('image')->extension();
+            Input::file('image')->storeAs('users', $image);
+
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
+            'last_name' => $data['last_name'],
+            'username' => $data['username'],
             'password' => bcrypt($data['password']),
+            'rol' => $rol,
+            'image' => $image,
         ]);
     }
 }

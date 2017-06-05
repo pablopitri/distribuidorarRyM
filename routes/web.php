@@ -17,6 +17,12 @@ Route::resource('/sales', 'SalesController');
 
 Route::resource('/products', 'ProductsController');
 
-Auth::routes();
+Route::resource('/users', 'UsersController');
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/products/search/{cod}/{nombre}/{categoria}', 'ProductsController@search');
+
+Route::get('/users/search/{nombre}/{email}/{priv}', 'UsersController@search');
+
+Route::get('/sales/search/{cod}/{fecha}/{vendedor}', 'SalesController@search');
+
+Auth::routes();

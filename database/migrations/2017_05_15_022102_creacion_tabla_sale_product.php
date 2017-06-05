@@ -13,7 +13,7 @@ class CreacionTablaSaleProduct extends Migration
      */
     public function up()
     {
-        Schema::create('sale_product', function(Blueprint $table){
+        Schema::create('product_sale', function(Blueprint $table){
             $table->increments('id');
             $table->integer('sale_id')->unsigned();
             $table->foreign('sale_id')->references('id')->on('sales');

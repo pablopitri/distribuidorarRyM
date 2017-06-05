@@ -5,5 +5,118 @@
 // Variables
 @import "variables";
 
-// Bootstrap
-@import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
+.center{
+	text-align: center !important;
+}
+
+.center2{
+	margin: 0 auto !important;
+}
+
+.margin-top{
+	margin-top: 5px;
+}
+
+.margin-bottom{
+	margin-bottom: 1em;
+}
+
+.form-group{
+	margin-bottom: 10px !important;
+}
+
+.float-bottom{
+	float: right;
+	text-align: right;
+}
+
+.product-image{
+	width: 140px;
+}
+
+.profile-image{
+	width: 160px;
+	height: 120px;
+}
+
+.thumbnail{
+	height: 100% !important;
+}
+
+.width{
+	width: 100%;
+}
+
+.relative{
+	position: relative;
+	margin-top: 45px;
+}
+
+.float{
+	position: absolute;
+	float: right;
+	top: 1.5em;
+	right: 0px;
+}
+
+.float-sale{
+	position: absolute;
+	float: right;
+	top: 1.5em;
+	right: 140px;
+}
+
+.sales{
+	color: black;
+	td {
+		font-size: 14px;
+	}
+}
+
+
+.hidden{
+	display: none;
+}
+
+.margin-r{
+	margin-right: 1em;
+}
+
+.user-image{
+	max-width: 320px;
+	max-height: 240px;
+}
+
+.left{
+	text-align: left;
+}
+
+.right{
+	text-align: right;
+}
+
+.total-bar{
+	padding-left: 40px;
+	width: 100%;
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	min-height: 75px;
+	background-color: #2a3f54;
+	color: white;
+	font-size: 32px;
+	text-transform: uppercase;
+}
+
+.total{
+	padding-top: 15px;
+	padding-right: 20px;
+}
+
+.sm-padding-top{
+	padding-top: 7px;
+}
+
+.black{
+	color: black;
+}
